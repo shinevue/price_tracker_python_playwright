@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from playwright.sync_api import sync_playwright, Browser, Page, TimeoutError, Response, Error, Request, CDPSession, \
     Route, ProxySettings
 
@@ -6,22 +8,39 @@ BROWSER_SETTINGS = ['--headless=new',
                     '--disable-notifications',
                     '--disable-gpu']
 
-url_to_check = 'https://onet.pl'
+
+@dataclass
+class UrlContent:
+    title: str
+    body: str
+    raw_html: str
 
 
+@dataclass
 class UrlData:
-    def __init__(self, url):
+    url: str
+    url_content: UrlContent = None
+
+
+class PlayScraper:
+    def __init__(self, url: UrlData):
         self.url = url
+        self.playwright = sync_playwright().start()
+        self.browser = None
+
+    def create_browser(self):
+        self.browser = self.playwright.chromium.launch(args=BROWSER_SETTINGS, headless=False)
 
     def visit_page(self):
-        playwright = sync_playwright().start()
-        browser = playwright.chromium.launch(args=BROWSER_SETTINGS, headless=False)
-        page = browser.new_page()
+        page = self.browser.new_page()
         page.goto(self.url)
-        print(page.title())
-        browser.close()
+        self.browser.close()
+
+    def run(self):
+        self.create_browser()
+        self.visit_page()
 
 
 if __name__ == '__main__':
-    url1 = UrlData(url_to_check)
-    url1.visit_page()
+    url_obj = UrlData('https://onet.pl')
+    url1 = PlayScraper(url_obj)
