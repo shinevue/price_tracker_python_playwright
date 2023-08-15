@@ -1,3 +1,5 @@
 .idea/
+.idea/scrape-it.iml
 .env
 __pycache__
+*.iml
