@@ -5,7 +5,7 @@ from urllib.parse import unquote
 
 import lxml
 from lxml import html
-from lxml.etree import ElementTree
+from lxml import etree
 from playwright.sync_api import sync_playwright, Browser, Page, TimeoutError, Response, Error, Request, CDPSession, \
     Route, ProxySettings
 from lxml.html.clean import Cleaner
@@ -105,7 +105,7 @@ class PlayScraper:
 
         title: Optional[str] = None
         raw_html: Optional[str] = None
-        html_tree: Optional[ElementTree] = None
+        html_tree: Optional[etree.ElementTree] = None
 
         def build_content(self):
             self.normalize_html()
@@ -115,18 +115,22 @@ class PlayScraper:
         @property
         def encoding(self):
             content_type = self.headers['content-type'].split(';')
-            encoding = content_type[1].strip().split('=')[1].strip()
-            return 'latin1' if encoding == 'latin-1' else encoding
+            try:
+                encoding = content_type[1].strip().split('=')[1].strip()
+                return 'latin1' if encoding == 'latin-1' else encoding
+            except IndexError:
+                return None
 
         def normalize_html(self):
             if self.raw_html:
                 self.raw_html = unicodedata.normalize("NFKC", unquote(self.raw_html.strip()))  # encoding=self.page_encoding
 
         def build_html_tree(self):
-            temp_bytes = self.raw_html.encode(self.encoding, errors='backslashreplace')
+            # Maybe forcing encoding is not the best way?
+            # temp_bytes = self.raw_html.encode(encoding=self.encoding, errors='backslashreplace')
 
             tree_parser = html.HTMLParser(remove_comments=True, recover=True)
-            self.html_tree = lxml.html.fromstring(temp_bytes, parser=tree_parser)
+            self.html_tree = lxml.html.fromstring(self.raw_html, parser=tree_parser)
 
         def get_title(self):
             if len(self.html_tree.xpath("//title[1]//text()")) > 0:
@@ -140,7 +144,9 @@ class PlayScraper:
 
 
 if __name__ == '__main__':
-    url1 = PlayScraper(url=URL, render_javascript=False)
-    url1.run()
-    print(url1.page_content.headers)
-    print(url1.page_content.title)
+    my_url = PlayScraper(url=URL, render_javascript=False)
+    my_url.run()
+    print(my_url.page_content.headers)
+    print(my_url.page_content.raw_html)
+    print(my_url.page_content.encoding)
+    print(my_url.page_content.title)
