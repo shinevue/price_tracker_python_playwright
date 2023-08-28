@@ -10,6 +10,9 @@ from playwright.sync_api import sync_playwright, Browser, Page, TimeoutError, Re
     Route, ProxySettings
 from lxml.html.clean import Cleaner
 
+from const import XPathSelector
+from urls import urls
+
 BROWSER_SETTINGS = ['--headless=new',
                     '--deny-permission-prompts',
                     '--disable-notifications',
@@ -25,9 +28,6 @@ REQUEST_HEADERS = {
     'User-Agent':
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0',
 }
-
-# URL = 'https://www.biznes.gov.pl/pl'
-URL = 'https://www.mediaexpert.pl/agd-male/do-kuchni/przygotowywanie_napojow/saturator-sodastream-terra-czarny-3-butelki-2-syropy'
 
 
 class PlayScraper:
@@ -113,6 +113,9 @@ class PlayScraper:
         hreflang_count: Optional[int] = None
         link_count: Optional[int] = None
 
+        # Site specific data
+        price: Optional[float] = None
+
         def __repr__(self):
             return f'URL: {self.url}\n' \
                    f'Status code: {self.status}\n' \
@@ -126,6 +129,7 @@ class PlayScraper:
             self.build_html_tree()
             self.get_title()
             self.count_items()
+            self.get_prices()
 
         @property
         def encoding(self):
@@ -162,11 +166,17 @@ class PlayScraper:
             self.hreflang_count = len(self.html_tree.xpath("//link[@rel='alternate' and @hreflang]"))
             self.link_count = len(self.html_tree.xpath("//a"))
 
-        def count_imgs(self):
-            pass
+        def get_prices(self):
+            main_price = self.html_tree.xpath(XPathSelector.MX.get('main_price')[0])[0]
+            cents = self.html_tree.xpath(XPathSelector.MX.get('cents')[0])[0]
+            self.price = float(main_price + '.' + cents)
 
 
 if __name__ == '__main__':
-    my_url = PlayScraper(url=URL, render_javascript=True)
-    my_url.run()
-    print(my_url.content)
+    for url in urls:
+        my_url = PlayScraper(url=url, render_javascript=True)
+        my_url.run()
+        print(my_url.content)
+        print(my_url.content.price)
+        # print(etree.tostring(my_url.content.html_tree, pretty_print=True))
+

@@ -3,3 +3,6 @@
 .env
 __pycache__
 *.iml
+
+urls.py
+const.py
