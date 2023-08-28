@@ -70,28 +70,6 @@ class PlayScraper:
         self.visit_page()
         self.page_content.build_content()
 
-    # @dataclass
-    # class Url:
-    #     """
-    #     Class representing URL metadata & raw, unprocessed data
-    #     """
-    #     url: str
-    #     status: Optional[str | int] = None
-    #     headers: Optional[dict] = None
-    #     body: Optional[str] = None
-    #     text: Optional[str] = None
-    #
-    #     def __init__(self, url):
-    #         self.url = url
-    #         self.page_content = self.PageContent()
-    #
-    #     def set_url_content(self):
-    #         self.page_content.raw_html = self.text
-    #
-    #     def get_html_encoding(self):
-    #         content_type = self.headers['content-type'].split(';')
-    #         self.page_content.encoding = content_type[1].strip().split('=').strip()
-
     @dataclass
     class PageContent:
         """
@@ -147,6 +125,6 @@ if __name__ == '__main__':
     my_url = PlayScraper(url=URL, render_javascript=False)
     my_url.run()
     print(my_url.page_content.headers)
-    print(my_url.page_content.raw_html)
+    # print(my_url.page_content.raw_html)
     print(my_url.page_content.encoding)
     print(my_url.page_content.title)
