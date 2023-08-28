@@ -15,7 +15,19 @@ BROWSER_SETTINGS = ['--headless=new',
                     '--disable-notifications',
                     '--disable-gpu']
 
-URL = 'https://www.biznes.gov.pl/pl'
+REQUEST_HEADERS = {
+    'Accept':
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'Accept-Encoding':
+        'gzip, deflate',
+    'Accept-Language':
+        'en-US,en;q=0.5',
+    'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0',
+}
+
+# URL = 'https://www.biznes.gov.pl/pl'
+URL = 'https://www.mediaexpert.pl/agd-male/do-kuchni/przygotowywanie_napojow/saturator-sodastream-terra-czarny-3-butelki-2-syropy'
 
 
 class PlayScraper:
@@ -38,7 +50,8 @@ class PlayScraper:
         """ Create browser and context instances """
         self.browser = self.playwright.chromium.launch(args=BROWSER_SETTINGS, headless=False)
         self.context = self.browser.new_context(proxy=None,
-                                                java_script_enabled=self.render_javascript)
+                                                java_script_enabled=self.render_javascript,
+                                                extra_http_headers=REQUEST_HEADERS)
 
     def visit_page(self):
         """ Use playwright tools to go to requested page and gather data, then assign to Url object """
@@ -50,6 +63,9 @@ class PlayScraper:
             self.response_error = "Connection Timeout"
         except Error as e:
             print(e.message)
+
+        if self.response.status == 403:
+            print("403 Error occured.")
 
         if self.response is not None:
             self.content.status = self.response.status
@@ -99,10 +115,11 @@ class PlayScraper:
 
         def __repr__(self):
             return f'URL: {self.url}\n' \
+                   f'Status code: {self.status}\n' \
                    f'Page Title: {self.title}\n' \
-                   f'Encoding: {self.encoding}' \
+                   f'Encoding: {self.encoding}\n' \
                    f'H1: {self.h1_text}\n' \
-                   f'H1s: {self.h1_count}, H2s: {self.h2_count}, Links: {self.link_count}'
+                   f'H1s: {self.h1_count}, H2s: {self.h2_count}, Links: {self.link_count}\n'
 
         def build_content(self):
             self.normalize_html()
@@ -150,7 +167,6 @@ class PlayScraper:
 
 
 if __name__ == '__main__':
-    my_url = PlayScraper(url=URL, render_javascript=False)
+    my_url = PlayScraper(url=URL, render_javascript=True)
     my_url.run()
-    # print(my_url.page_content.raw_html)
     print(my_url.content)
