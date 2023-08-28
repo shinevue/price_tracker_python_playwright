@@ -32,7 +32,7 @@ class PlayScraper:
     def __init__(self, url: str, render_javascript: bool = False):
         self.render_javascript = render_javascript
         self.metrics = None
-        self.page_content = self.PageContent(url)
+        self.content = self.Content(url)
 
     def create_browser(self):
         """ Create browser and context instances """
@@ -45,20 +45,20 @@ class PlayScraper:
         page = self.context.new_page()
         # cdp_session = self.context.new_cdp_session(page)
         try:
-            self.response: Response = page.goto(self.page_content.url)
+            self.response: Response = page.goto(self.content.url)
         except TimeoutError:
             self.response_error = "Connection Timeout"
         except Error as e:
             print(e.message)
 
         if self.response is not None:
-            self.page_content.status = self.response.status
-            self.page_content.headers = self.response.headers
-            self.page_content.body = self.response.body()
+            self.content.status = self.response.status
+            self.content.headers = self.response.headers
+            self.content.body = self.response.body()
             try:
-                self.page_content.raw_html = self.response.text()
+                self.content.raw_html = self.response.text()
             except UnicodeDecodeError:
-                self.page_content.text = self.response.body().decode("utf-8", errors="ignore")
+                self.content.text = self.response.body().decode("utf-8", errors="ignore")
 
         # if self.render_javascript:
         #     self.metrics = cdp_session.send("Performance.getMetrics")
@@ -68,27 +68,47 @@ class PlayScraper:
     def run(self):
         self.create_browser()
         self.visit_page()
-        self.page_content.build_content()
+        self.content.build_content()
 
     @dataclass
-    class PageContent:
+    class Content:
         """
         Class representing actual content of the page build from its response
         """
+
+        # Page metadata and raw content
         url: str
         status: Optional[str | int] = None
         headers: Optional[dict] = None
         body: Optional[str] = None
         text: Optional[str] = None
 
-        title: Optional[str] = None
+        # HTML constructs for parsing data
         raw_html: Optional[str] = None
         html_tree: Optional[etree.ElementTree] = None
+
+        # Basic page data
+        title: Optional[str] = None
+        h1_text: Optional[str] = None
+        h1_count: Optional[int] = None
+        h2_count: Optional[int] = None
+        h3_count: Optional[int] = None
+        h4_count: Optional[int] = None
+        hreflang_count: Optional[int] = None
+        link_count: Optional[int] = None
+
+        def __repr__(self):
+            return f'URL: {self.url}\n' \
+                   f'Page Title: {self.title}\n' \
+                   f'Encoding: {self.encoding}' \
+                   f'H1: {self.h1_text}\n' \
+                   f'H1s: {self.h1_count}, H2s: {self.h2_count}, Links: {self.link_count}'
 
         def build_content(self):
             self.normalize_html()
             self.build_html_tree()
             self.get_title()
+            self.count_items()
 
         @property
         def encoding(self):
@@ -114,8 +134,16 @@ class PlayScraper:
             if len(self.html_tree.xpath("//title[1]//text()")) > 0:
                 self.title = " ".join(unquote(str(self.html_tree.xpath("//title[1]//text()")[0])).split()).strip()
 
-        def count_h1(self):
-            pass
+        def get_h1_text(self):
+            self.h1_text = unicodedata.normalize("NFKC", unquote(str(self.html_tree.xpath("normalize-space(//h1)"))))
+
+        def count_items(self):
+            self.h1_count = len(self.html_tree.xpath("//h1"))
+            self.h3_count = len(self.html_tree.xpath("//h3"))
+            self.h2_count = len(self.html_tree.xpath("//h2"))
+            self.h4_count = len(self.html_tree.xpath("//h4"))
+            self.hreflang_count = len(self.html_tree.xpath("//link[@rel='alternate' and @hreflang]"))
+            self.link_count = len(self.html_tree.xpath("//a"))
 
         def count_imgs(self):
             pass
@@ -124,7 +152,5 @@ class PlayScraper:
 if __name__ == '__main__':
     my_url = PlayScraper(url=URL, render_javascript=False)
     my_url.run()
-    print(my_url.page_content.headers)
     # print(my_url.page_content.raw_html)
-    print(my_url.page_content.encoding)
-    print(my_url.page_content.title)
+    print(my_url.content)
