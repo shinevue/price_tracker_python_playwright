@@ -5,4 +5,6 @@ __pycache__
 *.iml
 
 urls.py
+urls.txt
 const.py
+output.xml

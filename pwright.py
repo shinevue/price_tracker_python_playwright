@@ -10,8 +10,9 @@ from playwright.sync_api import sync_playwright, Browser, Page, TimeoutError, Re
     Route, ProxySettings
 from lxml.html.clean import Cleaner
 
+import utils
 from const import XPathSelector
-from urls import urls
+from exceptions import UnmatchingPrices
 
 BROWSER_SETTINGS = ['--headless=new',
                     '--deny-permission-prompts',
@@ -151,6 +152,10 @@ class PlayScraper:
             tree_parser = html.HTMLParser(remove_comments=True, recover=True)
             self.html_tree = lxml.html.fromstring(self.raw_html, parser=tree_parser)
 
+        def save_html(self):
+            with open('output.xml', 'w') as file:
+                file.write(self.raw_html)
+
         def get_title(self):
             if len(self.html_tree.xpath("//title[1]//text()")) > 0:
                 self.title = " ".join(unquote(str(self.html_tree.xpath("//title[1]//text()")[0])).split()).strip()
@@ -167,16 +172,22 @@ class PlayScraper:
             self.link_count = len(self.html_tree.xpath("//a"))
 
         def get_prices(self):
-            main_price = self.html_tree.xpath(XPathSelector.MX.get('main_price')[0])[0]
-            cents = self.html_tree.xpath(XPathSelector.MX.get('cents')[0])[0]
-            self.price = float(main_price + '.' + cents)
+            prices_found = self.html_tree.xpath(XPathSelector.ME.main_price)
+            if prices_found:
+                if utils.compare_list_elements(prices_found):
+                    self.price = float(prices_found[0][:-2] + '.' + prices_found[0][-2:])
+                else:
+                    print('prices_found: ', prices_found)
+                    raise UnmatchingPrices
 
 
 if __name__ == '__main__':
+    urls = utils.read_urls('urls.txt')
     for url in urls:
         my_url = PlayScraper(url=url, render_javascript=True)
         my_url.run()
+        my_url.content.save_html()
         print(my_url.content)
-        print(my_url.content.price)
+        print('found_price: ', my_url.content.price)
         # print(etree.tostring(my_url.content.html_tree, pretty_print=True))
 
