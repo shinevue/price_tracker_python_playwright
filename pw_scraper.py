@@ -1,5 +1,6 @@
 import unicodedata
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional, Any
 from urllib.parse import unquote
 
@@ -105,6 +106,7 @@ class PlayScraper:
         html_tree: Optional[etree.ElementTree] = None
 
         # Basic page data
+        domain: Optional[str] = None
         title: Optional[str] = None
         h1_text: Optional[str] = None
         h1_count: Optional[int] = None
@@ -115,6 +117,7 @@ class PlayScraper:
         link_count: Optional[int] = None
 
         # Site specific data
+        product_name: Optional[str] = None
         price: Optional[float] = None
 
         def __repr__(self):
@@ -129,8 +132,9 @@ class PlayScraper:
             self.normalize_html()
             self.build_html_tree()
             self.get_title()
-            self.count_items()
+            # self.count_items()
             self.parse_prices()
+            self.parse_product_name()
 
         @property
         def encoding(self):
@@ -152,9 +156,8 @@ class PlayScraper:
             tree_parser = html.HTMLParser(remove_comments=True, recover=True)
             self.html_tree = lxml.html.fromstring(self.raw_html, parser=tree_parser)
 
-        def save_html(self):
-            with open('output.xml', 'w') as file:
-                file.write(self.raw_html)
+        def for_sheets(self):
+            return [self.domain, datetime.strftime(datetime.now(), '%Y-%m-%d, %H:%M:%S'), self.product_name, self.price, self.url]
 
         def get_title(self):
             if len(self.html_tree.xpath("//title[1]//text()")) > 0:
@@ -172,7 +175,7 @@ class PlayScraper:
             self.link_count = len(self.html_tree.xpath("//a"))
 
         def parse_product_name(self):
-            pass
+            self.product_name = self.html_tree.xpath(XPathSelector.ME.product_name)[0]
 
         def parse_prices(self):
             prices_found = self.html_tree.xpath(XPathSelector.ME.main_price)

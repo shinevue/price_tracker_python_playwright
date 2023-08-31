@@ -10,7 +10,7 @@ from googleapiclient.errors import HttpError
 
 load_dotenv()
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID")
+
 
 
 def authorize_google():
@@ -58,23 +58,3 @@ def append_to_sheets(creds, spreadsheet_id: str, range_name: str, value_input_op
 
     except HttpError as err:
         print(err)
-
-
-def main():
-    creds = authorize_google()
-    if creds:
-        range_name = "A2:E2"
-        values = [['hehe', 2, 'ga', 'gfda', '2023-08-02'],
-                  ['hehe', 2, 'ga', 'gfda', '2023-08-02']
-                  ]
-
-        append_to_sheets(creds=creds,
-                         spreadsheet_id=SPREADSHEET_ID,
-                         range_name=range_name,
-                         value_input_option="USER_ENTERED",
-                         values=values
-                         )
-
-
-if __name__ == '__main__':
-    main()
