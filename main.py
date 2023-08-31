@@ -1,14 +1,12 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
+import utils
+from pw_scraper import PlayScraper
 
-
-options = Options()
-options.add_argument("--headless=new")
-options.add_argument("--window-size=1920,1200")
-
-driver = webdriver.Chrome(options=options)
-driver.get('https://onet.pl')
-title = driver.title
-print(title)
-print(driver.page_source)
+if __name__ == '__main__':
+    urls = utils.read_urls('urls.txt')
+    for url in urls:
+        my_url = PlayScraper(url=url, render_javascript=True)
+        my_url.run()
+        my_url.content.save_html()
+        print(my_url.content)
+        print('found_price: ', my_url.content.price)
+        # print(etree.tostring(my_url.content.html_tree, pretty_print=True))
