@@ -8,3 +8,6 @@ urls.py
 urls.txt
 const.py
 output.xml
+
+*.json
+client-secret.json

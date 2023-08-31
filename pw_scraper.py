@@ -130,7 +130,7 @@ class PlayScraper:
             self.build_html_tree()
             self.get_title()
             self.count_items()
-            self.get_prices()
+            self.parse_prices()
 
         @property
         def encoding(self):
@@ -171,7 +171,10 @@ class PlayScraper:
             self.hreflang_count = len(self.html_tree.xpath("//link[@rel='alternate' and @hreflang]"))
             self.link_count = len(self.html_tree.xpath("//a"))
 
-        def get_prices(self):
+        def parse_product_name(self):
+            pass
+
+        def parse_prices(self):
             prices_found = self.html_tree.xpath(XPathSelector.ME.main_price)
             if prices_found:
                 if utils.compare_list_elements(prices_found):
