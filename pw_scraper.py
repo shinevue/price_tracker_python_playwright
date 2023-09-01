@@ -1,6 +1,8 @@
 import unicodedata
+import posixpath
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import PurePosixPath
 from typing import Optional, Any
 from urllib.parse import unquote
 
@@ -10,6 +12,7 @@ from lxml import etree
 from playwright.sync_api import sync_playwright, Browser, Page, TimeoutError, Response, Error, Request, CDPSession, \
     Route, ProxySettings
 from lxml.html.clean import Cleaner
+from urllib.parse import urlparse
 
 import utils
 from const import XPathSelector
@@ -48,6 +51,11 @@ class PlayScraper:
         self.metrics = None
         self.content = self.Content(url)
 
+    def run(self):
+        self.create_browser()
+        self.visit_page()
+        self.content.build_content()
+
     def create_browser(self):
         """ Create browser and context instances """
         self.browser = self.playwright.chromium.launch(args=BROWSER_SETTINGS, headless=False)
@@ -83,11 +91,6 @@ class PlayScraper:
 
         self.browser.close()
 
-    def run(self):
-        self.create_browser()
-        self.visit_page()
-        self.content.build_content()
-
     @dataclass
     class Content:
         """
@@ -119,6 +122,7 @@ class PlayScraper:
         # Site specific data
         product_name: Optional[str] = None
         price: Optional[float] = None
+        product_categories: Optional[tuple[str]] = None
 
         def __repr__(self):
             return f'URL: {self.url}\n' \
@@ -156,7 +160,7 @@ class PlayScraper:
             tree_parser = html.HTMLParser(remove_comments=True, recover=True)
             self.html_tree = lxml.html.fromstring(self.raw_html, parser=tree_parser)
 
-        def for_sheets(self):
+        def format_for_sheets(self):
             return [self.domain, datetime.strftime(datetime.now(), '%Y-%m-%d, %H:%M:%S'), self.product_name, self.price, self.url]
 
         def get_title(self):
@@ -173,6 +177,9 @@ class PlayScraper:
             self.h4_count = len(self.html_tree.xpath("//h4"))
             self.hreflang_count = len(self.html_tree.xpath("//link[@rel='alternate' and @hreflang]"))
             self.link_count = len(self.html_tree.xpath("//a"))
+
+        def parse_product_category(self):
+            self.product_categories = PurePosixPath(unquote(self.url)).parts[2:]
 
         def parse_product_name(self):
             self.product_name = self.html_tree.xpath(XPathSelector.ME.product_name)[0]

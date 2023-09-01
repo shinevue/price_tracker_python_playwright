@@ -20,12 +20,11 @@ if __name__ == '__main__':
         creds = sheets.authorize_google()
         if creds:
             range_name = "A2:E2"
-            values = [my_url.content.for_sheets()]
 
             sheets.append_to_sheets(creds=creds,
                                     spreadsheet_id=SPREADSHEET_ID,
                                     range_name=range_name,
                                     value_input_option="USER_ENTERED",
-                                    values=values
+                                    values=[my_url.content.format_for_sheets()]
                                     )
         # print(etree.tostring(my_url.content.html_tree, pretty_print=True))
