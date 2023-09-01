@@ -12,7 +12,7 @@ URL_LIMIT = 4
 if __name__ == '__main__':
     urls = utils.read_urls('urls.txt')
     for url in urls[:URL_LIMIT]:
-        my_url = PlayScraper(url=url, render_javascript=True)
+        my_url = PlayScraper(url=url, render_javascript=True, check_type='default')
         my_url.run()
         print('found name: ', my_url.content.product_name)
         print('found_price: ', my_url.content.price)
@@ -27,4 +27,4 @@ if __name__ == '__main__':
                                     value_input_option="USER_ENTERED",
                                     values=[my_url.content.format_for_sheets()]
                                     )
-        # print(etree.tostring(my_url.content.html_tree, pretty_print=True))
+        print(etree.tostring(my_url.content.html_tree, pretty_print=True))

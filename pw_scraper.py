@@ -46,7 +46,8 @@ class PlayScraper:
     response_error = None
     response: Optional[Response] = None
 
-    def __init__(self, url: str, render_javascript: bool = False):
+    def __init__(self, url: str, render_javascript: bool = False, check_type: str = 'default'):
+        self.check_type = check_type
         self.render_javascript = render_javascript
         self.metrics = None
         self.content = self.Content(url)
@@ -55,6 +56,10 @@ class PlayScraper:
         self.create_browser()
         self.visit_page()
         self.content.build_content()
+        if self.check_type == 'categories':
+            self.content.parse_categories()
+        elif self.check_type == 'default':
+            self.content.parse_product_data()
 
     def create_browser(self):
         """ Create browser and context instances """
@@ -137,8 +142,16 @@ class PlayScraper:
             self.build_html_tree()
             self.get_title()
             # self.count_items()
+
+        def parse_product_data(self):
             self.parse_prices()
             self.parse_product_name()
+            self.parse_product_category()
+
+        def parse_categories(self):
+            # check if url points to proper domain
+            categories = self.html_tree.xpath(XPathSelector.ME.category_list)
+            print(categories)
 
         @property
         def encoding(self):
@@ -179,7 +192,9 @@ class PlayScraper:
             self.link_count = len(self.html_tree.xpath("//a"))
 
         def parse_product_category(self):
+            url_parts = PurePosixPath(unquote(self.url)).parts
             self.product_categories = PurePosixPath(unquote(self.url)).parts[2:]
+            self.domain = url_parts[1]
 
         def parse_product_name(self):
             self.product_name = self.html_tree.xpath(XPathSelector.ME.product_name)[0]
