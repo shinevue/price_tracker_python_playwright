@@ -15,7 +15,7 @@ from lxml.html.clean import Cleaner
 from urllib.parse import urlparse
 
 import utils
-from const import XPathSelector
+from const import ME
 from exceptions import UnmatchingPrices
 
 BROWSER_SETTINGS = ['--headless=new',
@@ -197,10 +197,10 @@ class PlayScraper:
             self.domain = url_parts[1]
 
         def parse_product_name(self):
-            self.product_name = self.html_tree.xpath(XPathSelector.ME.product_name)[0]
+            self.product_name = self.html_tree.xpath(ME.XPathSelectors['product_name'])[0]
 
         def parse_prices(self):
-            prices_found = self.html_tree.xpath(XPathSelector.ME.main_price)
+            prices_found = self.html_tree.xpath(ME.XPathSelectors['main_price'])
             if prices_found:
                 if utils.compare_list_elements(prices_found):
                     self.price = float(prices_found[0][:-2] + '.' + prices_found[0][-2:])
