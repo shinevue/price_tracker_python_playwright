@@ -46,8 +46,7 @@ class PlayScraper:
     response_error = None
     response: Optional[Response] = None
 
-    def __init__(self, url: str, render_javascript: bool = False, check_type: str = 'default'):
-        self.check_type = check_type
+    def __init__(self, url, render_javascript: bool = False):
         self.render_javascript = render_javascript
         self.metrics = None
         self.content = self.Content(url)
@@ -55,11 +54,9 @@ class PlayScraper:
     def run(self):
         self.create_browser()
         self.visit_page()
-        self.content.build_content()
-        if self.check_type == 'categories':
-            self.content.parse_categories()
-        elif self.check_type == 'default':
-            self.content.parse_product_data()
+        self.content.normalize_html()
+        self.content.build_html_tree()
+        self.content.get_title()
 
     def create_browser(self):
         """ Create browser and context instances """
@@ -137,22 +134,6 @@ class PlayScraper:
                    f'H1: {self.h1_text}\n' \
                    f'H1s: {self.h1_count}, H2s: {self.h2_count}, Links: {self.link_count}\n'
 
-        def build_content(self):
-            self.normalize_html()
-            self.build_html_tree()
-            self.get_title()
-            # self.count_items()
-
-        def parse_product_data(self):
-            self.parse_prices()
-            self.parse_product_name()
-            self.parse_product_category()
-
-        def parse_categories(self):
-            # check if url points to proper domain
-            categories = self.html_tree.xpath(XPathSelector.ME.category_list)
-            print(categories)
-
         @property
         def encoding(self):
             content_type = self.headers['content-type'].split(';')
@@ -172,6 +153,15 @@ class PlayScraper:
 
             tree_parser = html.HTMLParser(remove_comments=True, recover=True)
             self.html_tree = lxml.html.fromstring(self.raw_html, parser=tree_parser)
+
+        def parse_product_data(self, site):
+            self.parse_prices(site)
+            self.parse_product_name(site)
+            self.parse_product_category()
+
+        def parse_categories(self, xpath_selector: str):
+            categories = self.html_tree.xpath(xpath_selector)
+            return categories
 
         def format_for_sheets(self):
             return [self.domain, datetime.strftime(datetime.now(), '%Y-%m-%d, %H:%M:%S'), self.product_name, self.price, self.url]
@@ -196,11 +186,11 @@ class PlayScraper:
             self.product_categories = PurePosixPath(unquote(self.url)).parts[2:]
             self.domain = url_parts[1]
 
-        def parse_product_name(self):
-            self.product_name = self.html_tree.xpath(ME.XPathSelectors['product_name'])[0]
+        def parse_product_name(self, site):
+            self.product_name = self.html_tree.xpath(site.XPathSelectors['product_name'])[0]
 
-        def parse_prices(self):
-            prices_found = self.html_tree.xpath(ME.XPathSelectors['main_price'])
+        def parse_prices(self, site):
+            prices_found = self.html_tree.xpath(site.XPathSelectors['main_price'])
             if prices_found:
                 if utils.compare_list_elements(prices_found):
                     self.price = float(prices_found[0][:-2] + '.' + prices_found[0][-2:])
