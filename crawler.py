@@ -17,15 +17,18 @@ def me_crawl_for_categories(site=ME,
         print('category: ', category)
         ps = PlayScraper(url=site.DOMAIN+category, render_javascript=True)
         ps.run()
-        inner_categories.extend(ps.content.parse_categories(xpath_selector=site.XPathSelectors['inner_categories']))
+        inner_categories.extend(path for path in ps.content.parse_categories(xpath_selector=site.XPathSelectors['inner_categories']) if path not in inner_categories)
     for cat in inner_categories:
         print(cat)
         session.add(models.MECategories(category_path=cat,
                                         time_discovered=datetime.now()))
     session.commit()
 
-    # for inner_cat in inner_categories:
-    #     ps = PlayScraper(url=site.DOMAIN + inner_cat, render_javascript=True)
-    #     ps.run()
+
+def me_crawl_category_for_products(site=ME):
+    ps = PlayScraper(url=site.DOMAIN+'/telewizory-i-rtv/kina-domowe/subwoofery')
+    ps.run()
+    products_paths = ps.content.parse_products_from_category(site)
+    return products_paths
 
 

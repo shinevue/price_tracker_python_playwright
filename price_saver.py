@@ -7,13 +7,18 @@ from scraper import PlayScraper
 
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID")
 RANGE_NAME = "A2:E2"
-URL_LIMIT = 4
+URL_LIMIT = 50
 
 
-def scrape():
-    urls = utils.read_urls('urls.txt')
-    for url in urls[:URL_LIMIT]:
-        my_url = PlayScraper(url=url, render_javascript=True)
+def me_scrape_price(paths_list: list[str] = None):
+    if not paths_list:
+        try:
+            paths_list = utils.read_urls('urls.txt')
+        except:
+            pass
+
+    for path in paths_list[:URL_LIMIT]:
+        my_url = PlayScraper(url=ME.DOMAIN + path, render_javascript=True)
         my_url.run()
         my_url.content.parse_product_data(site=ME)
 

@@ -186,6 +186,9 @@ class PlayScraper:
             self.product_categories = PurePosixPath(unquote(self.url)).parts[2:]
             self.domain = url_parts[1]
 
+        def parse_products_from_category(self, site):
+            return self.html_tree.xpath(site.XPathSelectors['product_url'])
+
         def parse_product_name(self, site):
             self.product_name = self.html_tree.xpath(site.XPathSelectors['product_name'])[0]
 
