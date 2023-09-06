@@ -1,16 +1,12 @@
-import os
-
-import utils
-import sheets
 from dotenv import load_dotenv
 
 from crawler import me_crawl_for_urls
-from scraper import PlayScraper
-from price_saver import scrape
+from database import db
 
 load_dotenv()
 
 
 if __name__ == '__main__':
     # scrape()
-    me_crawl_for_urls()
+    # me_crawl_for_urls()
+    db.test_db()

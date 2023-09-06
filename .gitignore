@@ -3,6 +3,7 @@
 .env
 __pycache__
 *.iml
+./credentials
 
 urls.py
 urls.txt
@@ -10,4 +11,4 @@ const.py
 output.xml
 
 *.json
-client-secret.json
+credentials/client-secret.json

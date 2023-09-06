@@ -1,6 +1,6 @@
 import os
 
-import sheets
+from database import sheets
 import utils
 from const import ME
 from scraper import PlayScraper
