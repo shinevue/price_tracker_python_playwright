@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from crawler import me_crawl_for_urls
+from crawler import me_crawl_for_categories
 from database import db
 
 load_dotenv()
@@ -8,5 +8,5 @@ load_dotenv()
 
 if __name__ == '__main__':
     # scrape()
-    # me_crawl_for_urls()
-    db.test_db()
+    me_crawl_for_categories()
+    # db.test_db()

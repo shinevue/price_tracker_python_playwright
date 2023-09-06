@@ -14,6 +14,8 @@ engine = create_engine(SQL_DB_URL)
 SessionLocal = orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+session = SessionLocal()
+
 
 def get_db():
     session = SessionLocal()
@@ -24,13 +26,13 @@ def get_db():
 
 
 def test_db():
-    session = SessionLocal()
+    test_session = SessionLocal()
     # test_entry = models.MECategories(category_path='/some/path',
     #                                  time_discovered=datetime.now(),
     #                                  product_count=12)
-    # session.add(test_entry)
+    # test_session.add(test_entry)
     delete_statement = select(models.MECategories).where(models.MECategories.id==1)
-    object_to_delete = session.scalars(delete_statement).first()
+    object_to_delete = test_session.scalars(delete_statement).first()
     print(object_to_delete)
-    session.delete(object_to_delete)
-    session.commit()
+    test_session.delete(object_to_delete)
+    test_session.commit()
