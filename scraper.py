@@ -88,9 +88,6 @@ class PlayScraper:
             except UnicodeDecodeError:
                 self.content.text = self.response.body().decode("utf-8", errors="ignore")
 
-        # if self.render_javascript:
-        #     self.metrics = cdp_session.send("Performance.getMetrics")
-
         self.browser.close()
 
     @dataclass
@@ -172,14 +169,6 @@ class PlayScraper:
 
         def get_h1_text(self):
             self.h1_text = unicodedata.normalize("NFKC", unquote(str(self.html_tree.xpath("normalize-space(//h1)"))))
-
-        def count_items(self):
-            self.h1_count = len(self.html_tree.xpath("//h1"))
-            self.h3_count = len(self.html_tree.xpath("//h3"))
-            self.h2_count = len(self.html_tree.xpath("//h2"))
-            self.h4_count = len(self.html_tree.xpath("//h4"))
-            self.hreflang_count = len(self.html_tree.xpath("//link[@rel='alternate' and @hreflang]"))
-            self.link_count = len(self.html_tree.xpath("//a"))
 
         def parse_product_category(self):
             url_parts = PurePosixPath(unquote(self.url)).parts
