@@ -18,11 +18,18 @@ def me_crawl_for_categories(site=ME,
         ps = PlayScraper(url=site.DOMAIN+category, render_javascript=True)
         ps.run()
         inner_categories.extend(path for path in ps.content.parse_categories(xpath_selector=site.XPathSelectors['inner_categories']) if path not in inner_categories)
+    inner_categories.sort(key=len, reverse=True)
+    filtered_categories = []
     for cat in inner_categories:
+        if not any(cat.startswith(existing_path) for existing_path in filtered_categories):
+            filtered_categories.append(cat)
         print(cat)
-        session.add(models.MECategories(category_path=cat,
-                                        time_discovered=datetime.now()))
-    session.commit()
+    print('--------')
+    for filcat in filtered_categories:
+        print(filcat)
+    #     session.add(models.MECategories(category_path=cat,
+    #                                     time_discovered=datetime.now()))
+    # session.commit()
 
 
 def me_crawl_category_for_products(site=ME):
@@ -30,5 +37,3 @@ def me_crawl_category_for_products(site=ME):
     ps.run()
     products_paths = ps.content.parse_products_from_category(site)
     return products_paths
-
-
