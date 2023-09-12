@@ -24,17 +24,6 @@ def me_crawl_for_categories(site=ME,
     for cat in inner_categories:
         if not any(existing_path.startswith(cat) for existing_path in filtered_categories):
             filtered_categories.append(cat)
-        else:
-            omitted_categories.append(cat)
-
-    print('--------')
-    print('filtered: ')
-    for filtered in filtered_categories:
-        print(filtered)
-    print('ommited:')
-    for omitted in omitted_categories:
-        print(omitted)
-
     for filcat in filtered_categories:
         session.add(models.MECategories(category_path=filcat,
                                         time_discovered=datetime.now()))
