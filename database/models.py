@@ -43,8 +43,8 @@ class MEPrices(Base):
     # Columns
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey('me_products.id'))
-    price: Mapped[float]
-    timestamp: Mapped[DateTime]
+    price: Mapped[int]
+    timestamp: Mapped[datetime]
     url: Mapped[str]
 
     # Relationships

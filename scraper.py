@@ -189,3 +189,20 @@ class PlayScraper:
                 else:
                     print('prices_found: ', prices_found)
                     raise UnmatchingPrices
+
+        def parse_prices_from_category_page(self, site):
+            result = []
+            for pc in self.html_tree.xpath(site.XPathSelectors['product_container_category_page']):
+                try:
+                    product_url = pc.xpath(site.XPathSelectors['product_url_category_page'])[0]
+                    product_name = pc.xpath(site.XPathSelectors['product_name_category_page'])[0].strip()
+                    product_price = pc.xpath(site.XPathSelectors['price_category_page'])[0]
+                    result.append({'name': product_name,
+                                   'price': product_price,
+                                   'url': product_url})
+                except:
+                    continue
+            return result
+
+        def parse_max_pagination_from_category_page(self, site):
+            return self.html_tree.xpath(site.XPathSelectors['category_page_pagination_limit'])
