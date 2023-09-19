@@ -1,9 +1,8 @@
 from datetime import datetime
+from typing import List
 
-from sqlalchemy import Integer, String, ForeignKey
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
+from sqlalchemy import Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 # declarative base class
@@ -19,3 +18,24 @@ class MECategories(Base):
     time_discovered: Mapped[datetime]
     last_crawl: Mapped[datetime]
     product_count: Mapped[int]
+    products: Mapped[List["MEProducts"]] = relationship()
+
+
+class MEProducts(Base):
+    __tablename__ = 'me_products'
+
+    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
+    product_name: Mapped[str] = mapped_column()
+    category_id: Mapped[int] = mapped_column(ForeignKey('me_categories.id'))
+    category: Mapped["MECategories"] = relationship(back_populates="products")
+
+
+class MEPrices(Base):
+    __tablename__ = 'me_prices'
+
+    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey('me_products.id'))
+    price: Mapped[float]
+    timestamp: Mapped[DateTime]
+    url: Mapped[str]
+
