@@ -27,7 +27,9 @@ class MEProducts(Base):
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     product_name: Mapped[str] = mapped_column()
     category_id: Mapped[int] = mapped_column(ForeignKey('me_categories.id'))
-    category: Mapped["MECategories"] = relationship(back_populates="products")
+
+    category: Mapped["MECategories"] = relationship(back_populates='products')
+    prices: Mapped[List["MEPrices"]] = relationship()
 
 
 class MEPrices(Base):
@@ -38,4 +40,6 @@ class MEPrices(Base):
     price: Mapped[float]
     timestamp: Mapped[DateTime]
     url: Mapped[str]
+
+    products: Mapped["MEProducts"] = relationship()
 
