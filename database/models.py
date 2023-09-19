@@ -13,21 +13,26 @@ class Base(DeclarativeBase):
 class MECategories(Base):
     __tablename__ = "me_categories"
 
+    # Columns
     id: Mapped[int] = mapped_column(primary_key=True)
     category_path: Mapped[str] = mapped_column(nullable=False)
     time_discovered: Mapped[datetime]
     last_crawl: Mapped[datetime]
     product_count: Mapped[int]
+
+    # Relationships
     products: Mapped[List["MEProducts"]] = relationship()
 
 
 class MEProducts(Base):
     __tablename__ = 'me_products'
 
+    # Columns
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     product_name: Mapped[str] = mapped_column()
     category_id: Mapped[int] = mapped_column(ForeignKey('me_categories.id'))
 
+    # Relationships
     category: Mapped["MECategories"] = relationship(back_populates='products')
     prices: Mapped[List["MEPrices"]] = relationship()
 
@@ -35,11 +40,13 @@ class MEProducts(Base):
 class MEPrices(Base):
     __tablename__ = 'me_prices'
 
+    # Columns
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey('me_products.id'))
     price: Mapped[float]
     timestamp: Mapped[DateTime]
     url: Mapped[str]
 
+    # Relationships
     products: Mapped["MEProducts"] = relationship()
 
