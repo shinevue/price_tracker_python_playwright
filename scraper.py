@@ -197,7 +197,7 @@ class PlayScraper:
                     product_url = pc.xpath(site.XPathSelectors['product_url_category_page'])[0]
                     product_name = pc.xpath(site.XPathSelectors['product_name_category_page'])[0].strip()
                     product_price = pc.xpath(site.XPathSelectors['price_category_page'])[0]
-                    result.append({'name': product_name,
+                    result.append({'product_name': product_name,
                                    'price': product_price,
                                    'url': product_url})
                 except:

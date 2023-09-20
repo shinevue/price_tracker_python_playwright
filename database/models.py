@@ -48,5 +48,5 @@ class MEPrices(Base):
     url: Mapped[str]
 
     # Relationships
-    products: Mapped["MEProducts"] = relationship()
+    products: Mapped["MEProducts"] = relationship(back_populates='prices')
 
