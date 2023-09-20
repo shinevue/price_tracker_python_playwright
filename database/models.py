@@ -30,6 +30,8 @@ class MEProducts(Base):
     # Columns
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     product_name: Mapped[str] = mapped_column()
+    monitoring: Mapped[int] = mapped_column()
+    monitoring_freq: Mapped[int] = mapped_column()
     category_id: Mapped[int] = mapped_column(ForeignKey('me_categories.id'))
 
     # Relationships

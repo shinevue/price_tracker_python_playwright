@@ -46,18 +46,14 @@ def me_scrape_prices_from_category_page(category_id: int,
     scraper.run()
     max_pages = int(scraper.content.parse_max_pagination_from_category_page(site=ME)[0])
     data = scraper.content.parse_prices_from_category_page(site=ME)
-    # if max_pages > 1:
-    #     while page <= max_pages:
-    #         page += 1
-    #         full_path = ME.DOMAIN + category_path + f"?limit=50&page={page}"
-    #         scraper = PlayScraper(url=full_path, render_javascript=True)
-    #         scraper.run()
-    #         data.extend(scraper.content.parse_prices_from_category_page(site=ME))
-    print('DATA SUMMARY\n')
-    print(f"pagination pages - {max_pages}")
-    print(f'found products - {len(data)}')
-    print(data)
-    #
+    if max_pages > 1:
+        while page <= max_pages:
+            page += 1
+            full_path = ME.DOMAIN + category_path + f"?limit=50&page={page}"
+            scraper = PlayScraper(url=full_path, render_javascript=True)
+            scraper.run()
+            data.extend(scraper.content.parse_prices_from_category_page(site=ME))
+
     for item in data:
         product_obj = m.MEProducts(product_name=item['product_name'],
                                    category_id=category_id)
