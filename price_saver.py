@@ -11,28 +11,35 @@ from scraper import PlayScraper
 
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID")
 RANGE_NAME = "A2:E2"
-URL_LIMIT = 50
 
 
-def me_scrape_price_from_product_page(paths_list: list[str] = None):
+def me_scrape_price_from_product_page(paths_list: list[str] = None,
+                                      target_db: str = 'google_sheets'):
+    url_limit = 50
     if not paths_list:
         try:
             paths_list = utils.read_urls('urls.txt')
         except:
             pass
 
-    for path in paths_list[:URL_LIMIT]:
+    for path in paths_list[:url_limit]:
         scraper = PlayScraper(url=ME.DOMAIN + path, render_javascript=True)
         scraper.run()
         scraper.content.parse_product_data(site=ME)
 
-        creds = sheets.authorize_google()
-        if creds:
-            sheets.append_to_sheets(creds=creds,
-                                    spreadsheet_id=SPREADSHEET_ID,
-                                    range_name=RANGE_NAME,
-                                    value_input_option="USER_ENTERED",
-                                    values=[scraper.content.format_for_sheets()])
+        match target_db:
+            case 'google_sheets':
+                creds = sheets.authorize_google()
+                if creds:
+                    sheets.append_to_sheets(creds=creds,
+                                            spreadsheet_id=SPREADSHEET_ID,
+                                            range_name=RANGE_NAME,
+                                            value_input_option="USER_ENTERED",
+                                            values=[scraper.content.format_for_sheets()])
+            case 'database':
+                pass
+            case other:
+                print(scraper.content.format_for_sheets())
 
 
 def me_scrape_prices_from_category_page(category_id: int,
@@ -62,4 +69,3 @@ def me_scrape_prices_from_category_page(category_id: int,
         product_obj.prices.append(price_obj)
         db.session.add(product_obj)
     db.session.commit()
-

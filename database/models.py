@@ -51,4 +51,3 @@ class MEPrices(Base):
 
     # Relationships
     products: Mapped["MEProducts"] = relationship(back_populates='prices')
-

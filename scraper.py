@@ -152,6 +152,7 @@ class PlayScraper:
             self.html_tree = lxml.html.fromstring(self.raw_html, parser=tree_parser)
 
         def parse_product_data(self, site):
+            """ """
             self.parse_prices(site)
             self.parse_product_name(site)
             self.parse_product_category()
