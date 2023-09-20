@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -14,7 +16,10 @@ RANGE_NAME = "A2:E2"
 
 
 def me_scrape_price_from_product_page(paths_list: list[str] = None,
+                                      paths_are_absolute: bool = True,
                                       target_db: str = 'google_sheets'):
+    """ Use list of paths to scrape prices directly from the single product pages. """
+
     url_limit = 50
     if not paths_list:
         try:
@@ -23,7 +28,8 @@ def me_scrape_price_from_product_page(paths_list: list[str] = None,
             pass
 
     for path in paths_list[:url_limit]:
-        scraper = PlayScraper(url=ME.DOMAIN + path, render_javascript=True)
+        full_url = path if paths_are_absolute else ME.DOMAIN + path
+        scraper = PlayScraper(url=full_url, render_javascript=True)
         scraper.run()
         scraper.content.parse_product_data(site=ME)
 
@@ -44,14 +50,18 @@ def me_scrape_price_from_product_page(paths_list: list[str] = None,
 
 def me_scrape_prices_from_category_page(category_id: int,
                                         session: Session = db.session):
-    stmt = select(m.MECategories).where(m.MECategories.id == category_id)
-    category_path = session.scalars(stmt).first().category_path
+    """ Scrape all products data including prices from a given category already stored in the database."""
 
+    stmt = select(m.MECategories).where(m.MECategories.id == category_id)
+    category_obj = session.scalars(stmt).first()
+    category_path = category_obj.category_path
+    print(category_path)
     page = 1
     full_path = ME.DOMAIN + category_path + f"?limit=50&page={page}"
+    print(f'full path {full_path}')
     scraper = PlayScraper(url=full_path, render_javascript=True)
     scraper.run()
-    max_pages = int(scraper.content.parse_max_pagination_from_category_page(site=ME)[0])
+    max_pages = int(scraper.content.parse_max_pagination_from_category_page(site=ME))
     data = scraper.content.parse_prices_from_category_page(site=ME)
     if max_pages > 1:
         while page <= max_pages:
@@ -68,4 +78,5 @@ def me_scrape_prices_from_category_page(category_id: int,
                                url=item['url'])
         product_obj.prices.append(price_obj)
         db.session.add(product_obj)
+    category_obj.last_crawl = datetime.now()
     db.session.commit()

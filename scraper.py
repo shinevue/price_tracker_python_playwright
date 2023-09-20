@@ -206,4 +206,7 @@ class PlayScraper:
             return result
 
         def parse_max_pagination_from_category_page(self, site):
-            return self.html_tree.xpath(site.XPathSelectors['category_page_pagination_limit'])
+            limit = self.html_tree.xpath(site.XPathSelectors['category_page_pagination_limit'])
+            if len(limit) == 0:
+                return 1
+            return limit[0]

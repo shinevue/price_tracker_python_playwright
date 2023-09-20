@@ -46,7 +46,7 @@ class MEPrices(Base):
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey('me_products.id'))
     price: Mapped[int]
-    timestamp: Mapped[datetime]
+    timestamp: Mapped[datetime] = mapped_column(default=datetime.now())
     url: Mapped[str]
 
     # Relationships
