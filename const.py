@@ -4,6 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class ME:
     DOMAIN = 'https://www.mediaexpert.pl'
+    SITEMAP_URL = 'https://www.mediaexpert.pl/sitemap/sitemap.product_categories.xml'
     ALIASES = ['mediaexpert', 'mediaexpert.pl', 'me']
     XPathSelectors = {'category_list': """//div[contains(@class,'menu-category-list')]/ul/li/a/@href""",
                       'inner_categories': """//div[@class='content']//div[@class='row']//a/@href""",

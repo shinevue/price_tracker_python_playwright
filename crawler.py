@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import requests
+
 from sqlalchemy.orm import Session
 
 from const import ME
@@ -9,9 +11,6 @@ from scraper import PlayScraper
 
 def me_crawl_for_categories(site=ME,
                             session: Session = db.session):
-    # TODO Zmienić sposób szukania lub filtrowania kategorii - niektórych brakuje, niektóre są błędne (nie są końcowymi kategoriami).
-    #  Scrapować sitemapę!!!
-    # https://www.mediaexpert.pl/sitemap/sitemap.product_categories.xml
     ps = PlayScraper(url=site.DOMAIN, render_javascript=True)
     ps.run()
     categories = ps.content.parse_categories(xpath_selector=site.XPathSelectors['category_list'])
@@ -37,3 +36,24 @@ def me_crawl_category_for_products(site=ME):
     ps.run()
     products_paths = ps.content.parse_products_from_category(site)
     return products_paths
+
+
+def parse_sitemap(site=ME,
+                  session: Session = db.session):
+    ps = PlayScraper(url=site.SITEMAP_URL)
+    ps.run(mode='sitemap')
+    urls = ps.content.sitemap_urls
+
+    filtered_categories = []
+    for url in urls:
+        url_ok = True
+        for compared_url in urls:
+            if compared_url.startswith(url + "/"):
+                url_ok = False
+                break
+        if url_ok:
+            filtered_categories.append(url)
+    for filcat in filtered_categories:
+        session.add(models.MECategories(category_path=filcat[len(site.DOMAIN):],
+                                        time_discovered=datetime.now()))
+    session.commit()

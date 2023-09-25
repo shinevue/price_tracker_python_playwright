@@ -36,5 +36,6 @@ if __name__ == '__main__':
     # crawler.me_crawl_for_categories()
     # paths = crawler.me_crawl_category_for_products()
     # price_saver.me_scrape_price(paths_list=paths)
-    price_saver.me_scrape_prices_from_category_page(category_id=10829)
+    # price_saver.me_scrape_prices_from_category_page(category_id=10829)
     # db.test_db()
+    crawler.parse_sitemap()

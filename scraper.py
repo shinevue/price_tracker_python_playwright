@@ -51,12 +51,16 @@ class PlayScraper:
         self.metrics = None
         self.content = self.Content(url)
 
-    def run(self):
+    def run(self, mode: str = 'default'):
         self.create_browser()
         self.visit_page()
-        self.content.normalize_html()
-        self.content.build_html_tree()
-        self.content.get_title()
+        if mode == 'default':
+            self.content.normalize_html()
+            self.content.build_html_tree()
+            self.content.get_title()
+        elif mode == 'sitemap':
+            print('sitemap')
+            self.content.parse_sitemap()
 
     def create_browser(self):
         """ Create browser and context instances """
@@ -123,6 +127,9 @@ class PlayScraper:
         price: Optional[float] = None
         product_categories: Optional[tuple[str]] = None
 
+        # Sitemaps
+        sitemap_urls: Optional[list[str]] = None
+
         def __repr__(self):
             return f'URL: {self.url}\n' \
                    f'Status code: {self.status}\n' \
@@ -150,6 +157,16 @@ class PlayScraper:
 
             tree_parser = html.HTMLParser(remove_comments=True, recover=True)
             self.html_tree = lxml.html.fromstring(self.raw_html, parser=tree_parser)
+
+        def parse_sitemap(self):
+            ns = {'s': "http://www.sitemaps.org/schemas/sitemap/0.9"}
+            parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+            xml_tree = etree.fromstring(self.raw_html.encode('utf-8'), parser=parser)
+            urls = xml_tree.xpath('//s:url/s:loc', namespaces=ns)
+            sitemap_urls = []
+            for url in urls:
+                sitemap_urls.append(url.text)
+            self.sitemap_urls = sorted(sitemap_urls)
 
         def parse_product_data(self, site):
             """ """
