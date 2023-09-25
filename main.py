@@ -13,16 +13,14 @@ load_dotenv()
 def main_arg(mode: str, domain: Optional[str], paths_source: Optional[str]):
     match mode:
         case 'crawl_categories' | 'cc':
-            match domain:
-                case 'mediaexpert' | 'mediaexpert.pl' | 'me':
-                    crawler.me_crawl_for_categories()
-                case other:
-                    print('Domain not supported.')
+            if domain in ['mediaexpert', 'mediaexpert.pl', 'me']:
+                crawler.me_crawl_for_categories()
+            else:
+                print('Domain not supported.')
 
         case 'scrape_prices' | 'sp':
-            match paths_source:
-                case 'file':
-                    price_saver.me_scrape_price_from_product_page()
+            if paths_source == 'file':
+                price_saver.me_scrape_price_from_product_page()
 
 
 if __name__ == '__main__':

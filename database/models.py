@@ -19,6 +19,8 @@ class MECategories(Base):
     time_discovered: Mapped[datetime]
     last_crawl: Mapped[datetime]
     product_count: Mapped[int]
+    is_checked: Mapped[bool] = mapped_column(default=False)
+    check_freq: Mapped[int] = mapped_column(default=0)
 
     # Relationships
     products: Mapped[List["MEProducts"]] = relationship()

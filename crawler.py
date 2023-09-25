@@ -9,6 +9,9 @@ from scraper import PlayScraper
 
 def me_crawl_for_categories(site=ME,
                             session: Session = db.session):
+    # TODO Zmienić sposób szukania lub filtrowania kategorii - niektórych brakuje, niektóre są błędne (nie są końcowymi kategoriami).
+    #  Scrapować sitemapę!!!
+    # https://www.mediaexpert.pl/sitemap/sitemap.product_categories.xml
     ps = PlayScraper(url=site.DOMAIN, render_javascript=True)
     ps.run()
     categories = ps.content.parse_categories(xpath_selector=site.XPathSelectors['category_list'])

@@ -18,3 +18,8 @@ class ME:
                       'price_category_page': """.//div[@class='prices']//div[contains(@class,'main-price')]/@mainprice""",
                       'product_url_category_page': """.//h2[contains(@class,'name')]//a/@href"""
                       }
+
+    class XSelector:
+        category_page_pagination_limit = """//div[contains(@class,'pagination')]//span[@class='from']/text()"""
+        product_container_category_page = """//div[@class='offer-box']"""
+        product_name_category_page = """.//h2[contains(@class,'name')]//a/text()"""
