@@ -4,7 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class ME:
     DOMAIN = 'https://www.mediaexpert.pl'
-    SITEMAP_URL = 'https://www.mediaexpert.pl/sitemap/sitemap.product_categories.xml'
+    CATEGORY_SITEMAP_URL = 'https://www.mediaexpert.pl/sitemap/sitemap.product_categories.xml'
     ALIASES = ['mediaexpert', 'mediaexpert.pl', 'me']
     XPathSelectors = {'category_list': """//div[contains(@class,'menu-category-list')]/ul/li/a/@href""",
                       'inner_categories': """//div[@class='content']//div[@class='row']//a/@href""",
@@ -17,10 +17,14 @@ class ME:
                       'product_container_category_page': """//div[@class='offer-box']""",
                       'product_name_category_page': """.//h2[contains(@class,'name')]//a/text()""",
                       'price_category_page': """.//div[@class='prices']//div[contains(@class,'main-price')]/@mainprice""",
-                      'product_url_category_page': """.//h2[contains(@class,'name')]//a/@href"""
+                      'product_url_category_page': """.//h2[contains(@class,'name')]//a/@href""",
+                      'product_code': """.//div[@class='content']//div[@class='flex-row']//span[contains(@class,'id')]/text()"""
                       }
 
     class XSelector:
         category_page_pagination_limit = """//div[contains(@class,'pagination')]//span[@class='from']/text()"""
         product_container_category_page = """//div[@class='offer-box']"""
         product_name_category_page = """.//h2[contains(@class,'name')]//a/text()"""
+        price_category_page = """.//div[@class='prices']//div[contains(@class,'main-price')]/@mainprice"""
+        product_url_category_page = """.//h2[contains(@class,'name')]//a/@href"""
+        product_code = """.//div[@class='content']//div[@class='flex-row']//span[contains(@class,'id')]/text()"""

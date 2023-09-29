@@ -13,3 +13,4 @@ output.xml
 *.json
 client-secret.json
 venv_scrape/
+screenshots/

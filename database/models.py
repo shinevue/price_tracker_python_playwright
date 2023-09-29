@@ -31,9 +31,11 @@ class MEProducts(Base):
 
     # Columns
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
+    product_code: Mapped[str] = mapped_column(unique=True)
     product_name: Mapped[str] = mapped_column()
     monitoring: Mapped[int] = mapped_column()
     monitoring_freq: Mapped[int] = mapped_column()
+    path: Mapped[str] = mapped_column(unique=True)
     category_id: Mapped[int] = mapped_column(ForeignKey('me_categories.id'))
 
     # Relationships
@@ -49,7 +51,6 @@ class MEPrices(Base):
     product_id: Mapped[int] = mapped_column(ForeignKey('me_products.id'))
     price: Mapped[int]
     timestamp: Mapped[datetime] = mapped_column(default=datetime.now())
-    url: Mapped[str]
 
     # Relationships
     products: Mapped["MEProducts"] = relationship(back_populates='prices')
