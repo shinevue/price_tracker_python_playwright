@@ -9,6 +9,7 @@ from database import models
 
 load_dotenv()
 SQL_DB_URL = os.environ.get("SQL_DB_URL")
+SQL_DB_URL = os.environ.get("POSTGRES_DB_URL")
 
 engine = create_engine(SQL_DB_URL)
 SessionLocal = orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -31,6 +32,7 @@ def test_db():
     #                                  time_discovered=datetime.now(),
     #                                  product_count=12)
     # test_session.add(test_entry)
+
     delete_statement = select(models.MECategories).where(models.MECategories.id==1)
     object_to_delete = test_session.scalars(delete_statement).first()
     print(object_to_delete)

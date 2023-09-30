@@ -1,13 +1,15 @@
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import Integer, String, ForeignKey, DateTime
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import Integer, String, ForeignKey, DateTime, MetaData
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, declarative_base
 
 
-# declarative base class
+metadata_obj = MetaData(schema="p_saver")
+
+
 class Base(DeclarativeBase):
-    pass
+    metadata = metadata_obj
 
 
 class MECategories(Base):
@@ -36,6 +38,7 @@ class MEProducts(Base):
     monitoring: Mapped[int] = mapped_column()
     monitoring_freq: Mapped[int] = mapped_column()
     path: Mapped[str] = mapped_column(unique=True)
+    last_update: Mapped[datetime]
     category_id: Mapped[int] = mapped_column(ForeignKey('me_categories.id'))
 
     # Relationships
