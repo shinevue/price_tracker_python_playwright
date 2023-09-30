@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import time
-from sqlalchemy import select, text
+from sqlalchemy import select
 
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
@@ -137,19 +137,6 @@ def me_prices_from_category(category_id: int,
             data.extend(ps.content.parse_prices_from_category_page(site=ME))
 
     # Insert into database:
-    # if save_results:
-    #     for item in data:
-    #         print(item)
-    #         product_obj = m.MEProducts(product_name=item['product_name'],
-    #                                    product_code=item['product_code'],
-    #                                    path=item['url'],
-    #                                    category_id=category_id)
-    #         price_obj = m.MEPrices(price=item['price'])
-    #         product_obj.prices.append(price_obj)
-    #     session.add(product_obj)
-    # category_obj.last_crawl = datetime.now()
-    # session.commit()
-
     if save_results:
         for item in data:
             print(item)
@@ -158,13 +145,28 @@ def me_prices_from_category(category_id: int,
                                        path=item['url'],
                                        category_id=category_id)
             price_obj = m.MEPrices(price=item['price'])
+            product_obj.prices.append(price_obj)
+            session.add(product_obj)
+    category_obj.last_crawl = datetime.now()
+    session.commit()
 
-            insert_st = insert(m.MEProducts).values(product_name=item['product_name'],
-                                                    product_code=item['product_code'],
-                                                    path=item['url'],
-                                                    category_id=category_id,
-                                                    last_update=datetime.now())
-            update_st = insert_st.on_conflict_do_update(product_name=item['product_name'])
-            print(update_st)
-            session.execute(update_st)
-            print(update_st.returning(m.MEProducts))
+    # if save_results:
+    #     for item in data:
+    #         print(item)
+    #         # product_obj = m.MEProducts(product_name=item['product_name'],
+    #         #                            product_code=item['product_code'],
+    #         #                            path=item['url'],
+    #         #                            category_id=category_id)
+    #         # price_obj = m.MEPrices(price=item['price'])
+    #
+    #         insert_st = insert(m.MEProducts).values(product_name=item['product_name'],
+    #                                                 product_code=item['product_code'],
+    #                                                 path=item['url'],
+    #                                                 category_id=category_id,
+    #                                                 last_update=datetime.now())
+    #         update_st = insert_st.on_conflict_do_update(constraint='me_products_pk',
+    #                                                     set_=dict(last_update=datetime.now()))
+    #         print(update_st)
+    #         session.execute(update_st)
+    #         result = session.scalars(update_st.returning(m.MEProducts.id), execution_options={'populate_existing': True})
+    #         print(result.first())

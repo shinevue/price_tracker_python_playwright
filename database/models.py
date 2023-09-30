@@ -35,7 +35,7 @@ class MEProducts(Base):
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     product_code: Mapped[str] = mapped_column(unique=True)
     product_name: Mapped[str] = mapped_column()
-    monitoring: Mapped[int] = mapped_column()
+    monitoring: Mapped[bool] = mapped_column(default=False)
     monitoring_freq: Mapped[int] = mapped_column()
     path: Mapped[str] = mapped_column(unique=True)
     last_update: Mapped[datetime]
