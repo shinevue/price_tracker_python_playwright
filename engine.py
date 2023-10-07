@@ -212,7 +212,12 @@ class PlayScraper:
 
         def parse_prices_from_category_page(self, site):
             result = []
-            product_codes = self.html_tree.xpath('''/html/head/meta[@property='product:skusPage']/@content''')[0].split(',')
+            product_codes = []
+            try:
+                product_codes = self.html_tree.xpath('''/html/head/meta[@property='product:skusPage']/@content''')[0].split(',')
+            except IndexError:
+                print("No product codes found.")
+                pass
             product_boxes = self.html_tree.xpath(site.XPathSelectors['product_container_category_page'])
 
             assert len(product_codes) == len(product_boxes), f'product codes lenghts doesnt match number of products for site {site}'
@@ -225,8 +230,8 @@ class PlayScraper:
                     product_url = pc.xpath(site.XPathSelectors['product_url_category_page'])[0]
                     product_name = pc.xpath(site.XPathSelectors['product_name_category_page'])[0].strip()
                     product_price = pc.xpath(site.XPathSelectors['price_category_page'])[0]
-                    # product_code = pc.xpath(site.XPathSelectors['product_code'])[0][5:]
                 except Exception as e:
+                    print(f"error at {self.url}")
                     print('exception:', e)
 
                 result.append({'product_name': product_name,

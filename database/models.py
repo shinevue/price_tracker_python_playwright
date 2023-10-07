@@ -19,9 +19,9 @@ class MECategories(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     category_path: Mapped[str] = mapped_column(nullable=False)
     time_discovered: Mapped[datetime]
-    last_crawl: Mapped[datetime]
+    last_check: Mapped[datetime]
     product_count: Mapped[int]
-    is_checked: Mapped[bool] = mapped_column(default=False)
+    regular_check: Mapped[bool] = mapped_column(default=False)
     check_freq: Mapped[int] = mapped_column(default=0)
 
     # Relationships

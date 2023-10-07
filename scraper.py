@@ -100,7 +100,7 @@ def me_price_from_product(paths_list: list[str] = None,
 
 
 def me_prices_from_category(category_id: int,
-                            all_pages: int = False,
+                            all_pages: int = True,
                             save_results: bool = False,
                             session: Session = db.session):
     """ Scrape all products data including prices from a given category already stored in the database."""
@@ -125,48 +125,29 @@ def me_prices_from_category(category_id: int,
     data = ps.content.parse_prices_from_category_page(site=ME)
     print(data)
 
-    # Visit next pages of category
+    # Repeat for next pages of category if exist
     if max_pagination > 1 and all_pages:
         while page <= max_pagination:
             time.sleep(10)
-
             page += 1
             full_path = ME.DOMAIN + category_path + f"?limit=50&page={page}"
             ps = PlayScraper(url=full_path, render_javascript=True)
             ps.run()
             data.extend(ps.content.parse_prices_from_category_page(site=ME))
 
-    # Insert into database:
     if save_results:
         for item in data:
             print(item)
-            product_obj = m.MEProducts(product_name=item['product_name'],
-                                       product_code=item['product_code'],
-                                       path=item['url'],
-                                       category_id=category_id)
-            price_obj = m.MEPrices(price=item['price'])
-            product_obj.prices.append(price_obj)
-            session.add(product_obj)
-    category_obj.last_crawl = datetime.now()
-    session.commit()
-
-    # if save_results:
-    #     for item in data:
-    #         print(item)
-    #         # product_obj = m.MEProducts(product_name=item['product_name'],
-    #         #                            product_code=item['product_code'],
-    #         #                            path=item['url'],
-    #         #                            category_id=category_id)
-    #         # price_obj = m.MEPrices(price=item['price'])
-    #
-    #         insert_st = insert(m.MEProducts).values(product_name=item['product_name'],
-    #                                                 product_code=item['product_code'],
-    #                                                 path=item['url'],
-    #                                                 category_id=category_id,
-    #                                                 last_update=datetime.now())
-    #         update_st = insert_st.on_conflict_do_update(constraint='me_products_pk',
-    #                                                     set_=dict(last_update=datetime.now()))
-    #         print(update_st)
-    #         session.execute(update_st)
-    #         result = session.scalars(update_st.returning(m.MEProducts.id), execution_options={'populate_existing': True})
-    #         print(result.first())
+            insert_st = insert(m.MEProducts).values(product_name=item['product_name'],
+                                                    product_code=item['product_code'],
+                                                    path=item['url'],
+                                                    category_id=category_id,
+                                                    last_update=datetime.now())
+            update_st = insert_st.on_conflict_do_update(constraint='me_products_pk',
+                                                        set_=dict(last_update=datetime.now()))
+            session.execute(update_st)
+            result = session.scalars(update_st.returning(m.MEProducts.id), execution_options={'populate_existing': True})
+            product_id = result.first()
+            price_obj = m.MEPrices(product_id=product_id, price=item['price'])
+            session.add(price_obj)
+        session.commit()
