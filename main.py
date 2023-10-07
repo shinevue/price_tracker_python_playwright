@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from dotenv import load_dotenv
 from sqlalchemy.sql.functions import now, func
+from sqlalchemy import update
 
 import engine
 import scraper
