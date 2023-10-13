@@ -28,7 +28,7 @@ def check_manager(session: Session = db.session):
     for cat_id in category_ids:
         print(f"Starting scraping prices for category {cat_id}")
 
-        scraper.me_prices_from_category(category_id=cat_id, save_results=True)
+        scraper.me_prices_from_category(category_id=cat_id, save_results=False)
         time.sleep(5)
         q = (update(m.MECategories).where(m.MECategories.id == cat_id)).values(last_check=datetime.now())
         session.execute(q)

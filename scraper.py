@@ -18,6 +18,10 @@ RANGE_NAME = "A2:E2"
 
 def me_crawl_categories(site=ME,
                         session: Session = db.session):
+    """
+    Gather data for multiple products at once. Fast, but vulnerable to non-standard price formants.
+    """
+
     ps = PlayScraper(url=site.DOMAIN, render_javascript=True)
     ps.run()
     categories = ps.content.parse_categories(xpath_selector=site.XPathSelectors['category_list'])
