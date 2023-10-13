@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import insert
 import utils
 from const import ME
 from database import db, models, sheets, models as m
-from engine import PlayScraper
+from visitor import Visitor
 from logger import Log
 
 
@@ -26,14 +26,14 @@ def me_crawl_categories(site=ME,
     Gather data for multiple products at once. Fast, but vulnerable to non-standard price formants.
     """
 
-    ps = PlayScraper(url=site.DOMAIN, render_javascript=True)
-    ps.run()
-    categories = ps.content.parse_categories(xpath_selector=site.XPathSelectors['category_list'])
+    v = Visitor(url=site.DOMAIN, render_javascript=True)
+    v.run()
+    categories = v.content.parse_categories(xpath_selector=site.XPathSelectors['category_list'])
     inner_categories = []
     for category in categories:
-        ps = PlayScraper(url=site.DOMAIN + category, render_javascript=True)
-        ps.run()
-        inner_categories.extend(path for path in ps.content.parse_categories(xpath_selector=site.XPathSelectors['inner_categories']) if path not in inner_categories)
+        v = Visitor(url=site.DOMAIN + category, render_javascript=True)
+        v.run()
+        inner_categories.extend(path for path in v.content.parse_categories(xpath_selector=site.XPathSelectors['inner_categories']) if path not in inner_categories)
     inner_categories.sort(reverse=True)
     filtered_categories = []
     for cat in inner_categories:
@@ -46,18 +46,18 @@ def me_crawl_categories(site=ME,
 
 
 def me_crawl_category_for_products(category_path: str, site=ME):
-    ps = PlayScraper(url=site.DOMAIN + category_path)
-    ps.run()
-    products_paths = ps.content.parse_products_from_category(site)
+    v = Visitor(url=site.DOMAIN + category_path)
+    v.run()
+    products_paths = v.content.parse_products_from_category(site)
     return products_paths
 
 
 def parse_sitemap_categories(site=ME,
                              session: Session = db.session):
     """ Parse categories from the XML sitemap. The most reliable and accurate way of scraping for categories. """
-    ps = PlayScraper(url=site.CATEGORY_SITEMAP_URL)
-    ps.run(mode='sitemap')
-    urls = ps.content.sitemap_urls
+    v = Visitor(url=site.CATEGORY_SITEMAP_URL)
+    v.run(mode='sitemap')
+    urls = v.content.sitemap_urls
 
     filtered_categories = []
     for url in urls:
@@ -88,9 +88,9 @@ def me_price_from_product(paths_list: list[str] = None,
 
     for path in paths_list[:url_limit]:
         full_url = path if paths_are_absolute else ME.DOMAIN + path
-        scraper = PlayScraper(url=full_url, render_javascript=True)
-        scraper.run()
-        scraper.content.parse_product_data(site=ME)
+        v = Visitor(url=full_url, render_javascript=True)
+        v.run()
+        v.content.parse_product_data(site=ME)
 
         match target_db:
             case 'google_sheets':
@@ -100,11 +100,11 @@ def me_price_from_product(paths_list: list[str] = None,
                                             spreadsheet_id=SPREADSHEET_ID,
                                             range_name=RANGE_NAME,
                                             value_input_option="USER_ENTERED",
-                                            values=[scraper.content.format_for_sheets()])
+                                            values=[v.content.format_for_sheets()])
             case 'database':
                 pass
             case other:
-                print(scraper.content.format_for_sheets())
+                print(v.content.format_for_sheets())
 
 
 def me_prices_from_category(category_id: int,
@@ -125,12 +125,12 @@ def me_prices_from_category(category_id: int,
     print(f'full path {full_path}')
 
     # Run browser
-    ps = PlayScraper(url=full_path, render_javascript=True)
-    ps.run()
+    v = Visitor(url=full_path, render_javascript=True)
+    v.run()
 
     # Parse data
-    max_pagination = int(ps.content.parse_max_pagination_from_category_page(site=ME))  # Pagination total pages
-    data = ps.content.parse_prices_from_category_page(site=ME)
+    max_pagination = int(v.content.parse_max_pagination_from_category_page(site=ME))  # Pagination total pages
+    data = v.content.parse_prices_from_category_page(site=ME)
     print(data)
 
     # Repeat for next pages of category if exist
@@ -139,9 +139,9 @@ def me_prices_from_category(category_id: int,
             time.sleep(10)
             page += 1
             full_path = ME.DOMAIN + category_path + f"?limit=50&page={page}"
-            ps = PlayScraper(url=full_path, render_javascript=True)
-            ps.run()
-            data.extend(ps.content.parse_prices_from_category_page(site=ME))
+            v = Visitor(url=full_path, render_javascript=True)
+            v.run()
+            data.extend(v.content.parse_prices_from_category_page(site=ME))
 
     if save_results:
         for item in data:

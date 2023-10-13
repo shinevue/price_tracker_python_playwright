@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from sqlalchemy.sql.functions import now, func
 from sqlalchemy import update
 
-import engine
+import visitor
 import scraper
 from database import db, models as m, models
 from logger import Log

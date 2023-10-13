@@ -22,8 +22,6 @@ from exceptions import UnmatchingPrices
 from logger import Log
 
 
-
-
 BROWSER_SETTINGS = ['--headless=new',
                     '--deny-permission-prompts',
                     '--disable-notifications',
@@ -43,7 +41,7 @@ REQUEST_HEADERS = {
 log = Log()
 
 
-class PlayScraper:
+class Visitor:
     """
     Main outer class for the scraper using Playwright
     """
@@ -237,19 +235,16 @@ class PlayScraper:
                         product_url = pc.xpath(site.XPathSelectors['product_url_category_page'])[0]
                     except Exception as e:
                         log.write(f'no product URL found at product #{index}')
-                        print(f'no product URL found at product #{index}')
                         print('exception:', e)
                     try:
                         product_name = pc.xpath(site.XPathSelectors['product_name_category_page'])[0].strip()
                     except Exception as e:
                         log.write(f'no product name found at product #{index}')
-                        print(f'no product name found at product #{index}')
                         print('exception:', e)
                     try:
                         product_price = pc.xpath(site.XPathSelectors['price_category_page'])[0]
                     except Exception as e:
                         log.write(f'no price found at product #{index}')
-                        print(f'no price found at product #{index}')
                         print('exception:', e)
                 except Exception as e:
                     print(f"error at {self.url}")
