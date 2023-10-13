@@ -19,7 +19,10 @@ load_dotenv()
 log = Log()
 
 
-def check_manager(session: Session = db.session):
+def check_manager(session: Session = db.session) -> None:
+    """
+    Searches database for categories for check based on 'regular_check' column and specified time interval in days.
+    """
     q = (select(m.MECategories.id)
          .where(and_(m.MECategories.regular_check,
                      or_((m.MECategories.last_check + func.make_interval(0, 0, 0, m.MECategories.check_freq) <= datetime.now()),

@@ -141,8 +141,7 @@ class Visitor:
                    f'Status code: {self.status}\n' \
                    f'Page Title: {self.title}\n' \
                    f'Encoding: {self.encoding}\n' \
-                   f'H1: {self.h1_text}\n' \
-                   f'H1s: {self.h1_count}, H2s: {self.h2_count}, Links: {self.link_count}\n'
+
 
         @property
         def encoding(self):

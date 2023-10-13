@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class Log:
-    def __init__(self, log_filename='mylog.log'):
+    def __init__(self, log_filename: str = 'log.log'):
         self.log_filename = log_filename
         self.logs_path = self.create_logs_directory()
         self.log_file_path = self.create_log_file()
