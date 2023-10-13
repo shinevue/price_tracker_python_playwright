@@ -19,6 +19,10 @@ from urllib.parse import urlparse
 import utils
 from const import ME
 from exceptions import UnmatchingPrices
+from logger import Log
+
+
+
 
 BROWSER_SETTINGS = ['--headless=new',
                     '--deny-permission-prompts',
@@ -35,6 +39,8 @@ REQUEST_HEADERS = {
     'User-Agent':
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0',
 }
+
+log = Log()
 
 
 class PlayScraper:
@@ -230,16 +236,19 @@ class PlayScraper:
                     try:
                         product_url = pc.xpath(site.XPathSelectors['product_url_category_page'])[0]
                     except Exception as e:
+                        log.write(f'no product URL found at product #{index}')
                         print(f'no product URL found at product #{index}')
                         print('exception:', e)
                     try:
                         product_name = pc.xpath(site.XPathSelectors['product_name_category_page'])[0].strip()
                     except Exception as e:
+                        log.write(f'no product name found at product #{index}')
                         print(f'no product name found at product #{index}')
                         print('exception:', e)
                     try:
                         product_price = pc.xpath(site.XPathSelectors['price_category_page'])[0]
                     except Exception as e:
+                        log.write(f'no price found at product #{index}')
                         print(f'no price found at product #{index}')
                         print('exception:', e)
                 except Exception as e:

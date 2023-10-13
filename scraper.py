@@ -11,9 +11,13 @@ import utils
 from const import ME
 from database import db, models, sheets, models as m
 from engine import PlayScraper
+from logger import Log
+
 
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID")
 RANGE_NAME = "A2:E2"
+
+log = Log()
 
 
 def me_crawl_categories(site=ME,

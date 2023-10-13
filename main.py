@@ -13,8 +13,10 @@ from sqlalchemy import update
 import engine
 import scraper
 from database import db, models as m, models
+from logger import Log
 
 load_dotenv()
+log = Log()
 
 
 def check_manager(session: Session = db.session):

@@ -14,3 +14,4 @@ output.xml
 client-secret.json
 venv_scrape/
 screenshots/
+logs/
