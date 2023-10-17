@@ -16,25 +16,35 @@ load_dotenv()
 log = Log()
 
 
-def check_manager(session: Session = db.session) -> None:
+def check_manager(session: Session = db.session,
+                  save_results: bool = False,
+                  categories_limit: int = 1) -> None:
     """
     Searches database for categories for check based on 'regular_check' column and specified time interval in days.
+    :param session: SQLAlchemy database session
+    :param bool save_results: If True, will save results to database.
+    :param int categories_limit: Number of categories to scrape in current run.
     """
+
+    # Search for categories
     q = (select(m.MECategories.id)
          .where(and_(m.MECategories.regular_check,
                      or_((m.MECategories.last_check + func.make_interval(0, 0, 0, m.MECategories.check_freq) <= datetime.now()),
                          m.MECategories.last_check == None)))
          .order_by(m.MECategories.last_check.desc())
-         .limit(2))
+         .limit(categories_limit))
     category_ids = session.scalars(q).all()
+
     for cat_id in category_ids:
         print(f"Starting scraping prices for category {cat_id}")
-
         scraper.me_prices_from_category(category_id=cat_id, save_results=False)
         time.sleep(5)
-        q = (update(m.MECategories).where(m.MECategories.id == cat_id)).values(last_check=datetime.now())
-        session.execute(q)
+
+        if save_results:
+            q = (update(m.MECategories).where(m.MECategories.id == cat_id)).values(last_check=datetime.now())
+            session.execute(q)
 
 
 if __name__ == '__main__':
-    check_manager()
+    check_manager(save_results=False,
+                  categories_limit=2)

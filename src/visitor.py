@@ -1,4 +1,5 @@
 import unicodedata
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import PurePosixPath
 from typing import Optional
@@ -10,6 +11,7 @@ from lxml import etree
 from playwright.sync_api import sync_playwright, TimeoutError, Response, Error
 
 import utils
+from const import ME
 from exceptions import UnmatchingPrices
 from logger import Log
 
@@ -92,7 +94,7 @@ class Visitor:
 
         self.browser.close()
 
-
+    @dataclass
     class Content:
         """
         Class representing actual content of the page build from its response
@@ -220,10 +222,10 @@ class Visitor:
             print('product codes:', product_codes)
             print('product codes len:', len(product_codes))
             for index, pc in enumerate(product_boxes):
-                product_url, product_name, product_price = None, None, None
+                product_url, product_name, product_price = [], [], []
                 try:
                     try:
-                        product_url = pc.xpath(site.XPathSelectors['product_url_category_page'])[0]
+                        product_url: list = pc.xpath(site.XPathSelectors['product_url_category_page'])[0]
                     except Exception as e:
                         log.write(f'no product URL found at product #{index}')
                         print('exception:', e)
@@ -233,7 +235,11 @@ class Visitor:
                         log.write(f'no product name found at product #{index}')
                         print('exception:', e)
                     try:
-                        product_price = pc.xpath(site.XPathSelectors['price_category_page'])[0]
+                        product_price: list = pc.xpath(site.XSelector.CategoryPage.price)
+                        print(f'price after 1 selector: {product_price}')
+                        if not product_price:
+                            product_price: list = pc.xpath(site.XSelector.CategoryPage.price_with_code)
+                            print(f'price after 2 selector: {product_price}')
                     except Exception as e:
                         log.write(f'no price found at product #{index}')
                         print('exception:', e)
