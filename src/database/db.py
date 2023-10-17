@@ -1,11 +1,10 @@
 import os
-from datetime import datetime
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, orm, select
 from sqlalchemy.ext.declarative import declarative_base
 
-from database import models
+from src.database import models
 
 load_dotenv()
 SQL_DB_URL = os.environ.get("SQL_DB_URL")
@@ -33,7 +32,7 @@ def test_db():
     #                                  product_count=12)
     # test_session.add(test_entry)
 
-    delete_statement = select(models.MECategories).where(models.MECategories.id==1)
+    delete_statement = select(models.MECategories).where(models.MECategories.id == 1)
     object_to_delete = test_session.scalars(delete_statement).first()
     print(object_to_delete)
     test_session.delete(object_to_delete)

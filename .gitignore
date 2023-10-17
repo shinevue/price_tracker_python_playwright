@@ -6,12 +6,12 @@ __pycache__
 ./credentials
 
 urls.py
-urls.txt
-const.py
+src/urls.txt
+src/const.py
 output.xml
 
 *.json
-client-secret.json
+src/client-secret.json
 venv_scrape/
-screenshots/
-logs/
+src/screenshots/
+src/logs/

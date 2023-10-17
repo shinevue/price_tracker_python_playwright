@@ -1,23 +1,15 @@
-import time
 import unicodedata
-import posixpath
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import PurePosixPath
-from traceback import print_exc
-from typing import Optional, Any
+from typing import Optional
 from urllib.parse import unquote
 
 import lxml
 from lxml import html
 from lxml import etree
-from playwright.sync_api import sync_playwright, Browser, Page, TimeoutError, Response, Error, Request, CDPSession, \
-    Route, ProxySettings
-from lxml.html.clean import Cleaner
-from urllib.parse import urlparse
+from playwright.sync_api import sync_playwright, TimeoutError, Response, Error
 
 import utils
-from const import ME
 from exceptions import UnmatchingPrices
 from logger import Log
 
@@ -100,7 +92,7 @@ class Visitor:
 
         self.browser.close()
 
-    @dataclass
+
     class Content:
         """
         Class representing actual content of the page build from its response

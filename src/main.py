@@ -1,18 +1,15 @@
 import time
-from argparse import ArgumentParser
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import datetime
 
 from sqlalchemy import select, and_, or_
 from sqlalchemy.orm import Session
 
 from dotenv import load_dotenv
-from sqlalchemy.sql.functions import now, func
+from sqlalchemy.sql.functions import func
 from sqlalchemy import update
 
-import visitor
 import scraper
-from database import db, models as m, models
+from database import db, models as m
 from logger import Log
 
 load_dotenv()
