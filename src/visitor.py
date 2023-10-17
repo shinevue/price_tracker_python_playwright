@@ -221,6 +221,8 @@ class Visitor:
 
             print('product codes:', product_codes)
             print('product codes len:', len(product_codes))
+
+            empty_prices, coupon_prices, normal_prices = 0, 0, 0
             for index, pc in enumerate(product_boxes):
                 product_url, product_name, product_price = [], [], []
                 try:
@@ -236,13 +238,21 @@ class Visitor:
                         print('exception:', e)
                     try:
                         product_price: list = pc.xpath(site.XSelector.CategoryPage.price)
-                        print(f'price after 1 selector: {product_price}')
+                        normal_prices += 1 if product_price else normal_prices
                         if not product_price:
                             product_price: list = pc.xpath(site.XSelector.CategoryPage.price_with_code)
+                            coupon_prices += 1 if product_price else coupon_prices
                             print(f'price after 2 selector: {product_price}')
+                        else:
+                            empty_prices += 1
                     except Exception as e:
                         log.write(f'no price found at product #{index}')
                         print('exception:', e)
+
+                    msg = f"""Found prices: \n Normal: {normal_prices}\n Coupon: {coupon_prices}\n Empty: {empty_prices}\n"""
+                    log.write(msg)
+                    print(msg)
+
                 except Exception as e:
                     print(f"error at {self.url}")
                     print('exception:', e)

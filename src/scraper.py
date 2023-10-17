@@ -130,14 +130,16 @@ def me_prices_from_category(category_id: int,
 
     # Parse data
     max_pagination = int(v.content.parse_max_pagination_from_category_page(site=ME))  # Pagination total pages
+    print(f'Pages: {max_pagination}')
+
     data = v.content.parse_prices_from_category_page(site=ME)
-    print(data)
 
     # Repeat for next pages of category if exist
     if max_pagination > 1 and all_pages:
         while page <= max_pagination:
             time.sleep(10)
             page += 1
+            print(f"Page {page}")
             full_path = ME.DOMAIN + category_path + f"?limit=50&page={page}"
             v = Visitor(url=full_path, render_javascript=True)
             v.run()
@@ -145,7 +147,7 @@ def me_prices_from_category(category_id: int,
 
     if save_results:
         for item in data:
-            print(item)
+            print('printing', item)
             insert_st = insert(m.MEProducts).values(product_name=item['product_name'],
                                                     product_code=item['product_code'],
                                                     path=item['url'],
