@@ -15,3 +15,4 @@ src/client-secret.json
 venv_scrape/
 src/screenshots/
 src/logs/
+logs/
