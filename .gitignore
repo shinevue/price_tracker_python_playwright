@@ -11,7 +11,7 @@ src/const.py
 output.xml
 
 *.json
-src/client-secret.json
+src/auth/client-secret.json
 venv_scrape/
 src/screenshots/
 src/logs/

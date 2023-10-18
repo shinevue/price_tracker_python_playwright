@@ -26,7 +26,6 @@ def check_manager(session: Session = db.session,
     :param bool save_results: If True, will save results to database.
     :param int categories_limit: Number of categories to scrape in current run.
     :param delay: Seconds to wait between page visits.
-
     """
 
     # Search for categories
@@ -50,6 +49,6 @@ def check_manager(session: Session = db.session,
 
 
 if __name__ == '__main__':
-    check_manager(save_results=False,
+    check_manager(save_results=True,
                   categories_limit=1,
                   delay=2)

@@ -238,21 +238,18 @@ class Visitor:
                         print('exception:', e)
                     try:
                         product_price: list = pc.xpath(site.XSelector.CategoryPage.price)
-                        normal_prices += 1 if product_price else normal_prices
-                        if not product_price:
-                            product_price: list = pc.xpath(site.XSelector.CategoryPage.price_with_code)
-                            coupon_prices += 1 if product_price else coupon_prices
-                            print(f'price after 2 selector: {product_price}')
+                        if product_price:
+                            normal_prices += 1
                         else:
-                            empty_prices += 1
+                            product_price: list = pc.xpath(site.XSelector.CategoryPage.price_with_code)
+                            if product_price:
+                                coupon_prices += 1
+                                print(f'price after 2 selector: {product_price}')
+                            else:
+                                empty_prices += 1
                     except Exception as e:
                         log.write(f'no price found at product #{index}')
                         print('exception:', e)
-
-                    msg = f"""Found prices: \n Normal: {normal_prices}\n Coupon: {coupon_prices}\n Empty: {empty_prices}\n"""
-                    log.write(msg)
-                    print(msg)
-
                 except Exception as e:
                     print(f"error at {self.url}")
                     print('exception:', e)
@@ -261,6 +258,10 @@ class Visitor:
                                'product_code': product_codes[index],
                                'price': product_price,
                                'url': product_url})
+
+            msg = f"""Found prices: \n Normal: {normal_prices}\n Coupon: {coupon_prices}\n Empty: {empty_prices}\n"""
+            log.write(msg)
+            print(msg)
             return result
 
         def parse_max_pagination_from_category_page(self, site):
