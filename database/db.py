@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, orm, select
 from sqlalchemy.ext.declarative import declarative_base
 
-from src.database import models
+from database import models
 
 load_dotenv()
 SQL_DB_URL = os.environ.get("SQL_DB_URL")
