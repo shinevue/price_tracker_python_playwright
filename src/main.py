@@ -44,8 +44,9 @@ def check_manager(session: Session = db.session,
 
         if save_results:
             print("Saving to database...")
-            q = (update(m.MECategories).where(m.MECategories.id == cat_id)).values(last_check=datetime.now())
+            q = update(m.MECategories).where(m.MECategories.id == cat_id).values(last_check=datetime.now())
             session.execute(q)
+            session.commit()
 
 
 if __name__ == '__main__':

@@ -158,6 +158,10 @@ def me_prices_from_category(category_id: int,
             session.execute(update_st)
             result = session.scalars(update_st.returning(m.MEProducts.id), execution_options={'populate_existing': True})
             product_id = result.first()
-            price_obj = m.MEPrices(product_id=product_id, price=item['price'])
+            try:
+                price = int(item['price'][0])
+            except (KeyError, IndexError, ValueError):
+                price = None
+            price_obj = m.MEPrices(product_id=product_id, price=price)
             session.add(price_obj)
         session.commit()
