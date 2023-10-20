@@ -10,7 +10,8 @@ router = APIRouter(prefix='products',
 
 crud = CRUDBase(m.MEProducts)
 
+
 @router.get('/{product_id}')
 async def read_product(product_id: int,
                        session: Session = Depends(get_db)):
-    return crud.get()
+    return crud.get(session=session, item_id=product_id)
