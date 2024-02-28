@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append(".")
+
 import time
 from datetime import datetime
 
@@ -50,6 +54,6 @@ def check_manager(session: Session = db.session,
 
 
 if __name__ == '__main__':
-    check_manager(save_results=True,
+    check_manager(save_results=False,
                   categories_limit=1,
                   delay=2)

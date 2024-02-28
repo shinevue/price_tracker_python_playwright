@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from database import models
 
 load_dotenv()
-SQL_DB_URL = os.environ.get("SQL_DB_URL")
+# SQL_DB_URL = os.environ.get("SQL_DB_URL")
 SQL_DB_URL = os.environ.get("POSTGRES_DB_URL")
 
 engine = create_engine(SQL_DB_URL)
