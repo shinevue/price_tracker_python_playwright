@@ -1,16 +1,37 @@
+import unicodedata
+
 from typing import Optional
-from playwright.sync_api import sync_playwright, Response, TimeoutError, Error
+from urllib.parse import unquote
+import lxml.html
+import lxml.etree
+from playwright.sync_api import sync_playwright, Response, TimeoutError
 
 
-class Page:
+class PageContent:
     def __init__(
         self, url: str, status_code: int, headers: dict, body: bytes, raw_html: str
-    ) -> None:
+    ):
         self.url = url
         self.status_code = status_code
         self.headers = headers
         self.body = body
         self.raw_html = raw_html
+
+    @property
+    def encoding(self) -> Optional[str]:
+        content_type = self.headers["content-type"].split(";")
+        try:
+            encoding = content_type[1].strip().split("=")[1].strip()
+            return "latin1" if encoding == "latin-1" else encoding
+        except IndexError:
+            return None
+
+    @property
+    def html_tree(self) -> lxml.etree.ElementTree:
+        tree_parser = lxml.html.HTMLParser(remove_comments=True, recover=True)
+        normalized_html = unicodedata.normalize("NFKC", unquote(self.raw_html.strip()))
+        return lxml.html.fromstring(normalized_html, parser=tree_parser)
+
 
 
 class Browser:
@@ -45,18 +66,18 @@ class Browser:
             extra_http_headers=self.REQUEST_HEADERS,
         )
 
-    def visit_url(self, url: str) -> Page | None:
+    def visit_url(self, url: str) -> PageContent | None:
         """Visit the given URL"""
         page = self.context.new_page()
         try:
-            response = page.goto(url, wait_until="commit")
+            response: Response | None = page.goto(url, wait_until="commit")
             if not response:
                 self.response_error = "No response"
                 return None
             if response.status != 200:
                 self.response_error = f"Error: {response.status}"
                 return None
-            return Page(
+            return PageContent(
                 url, response.status, response.headers, response.body(), response.text()
             )
         except TimeoutError:

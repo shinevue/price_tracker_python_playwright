@@ -14,5 +14,5 @@ if __name__ == "__main__":
             continue
         print(page.url)
         print(page.status_code)
-        print(page.raw_html[:100])
+        print(page.html_tree[:150])
 
