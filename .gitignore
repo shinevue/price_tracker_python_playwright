@@ -16,3 +16,5 @@ venv_scrape/
 src/screenshots/
 src/logs/
 logs/
+
+*selectors_me.py
