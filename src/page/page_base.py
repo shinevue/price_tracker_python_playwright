@@ -35,18 +35,23 @@ class PageContent:
         return lxml.html.fromstring(normalized_html, parser=tree_parser)
 
 
-class CategoryPage(ABC):
+class PageType(ABC):
+    def __init__(self, page_content: PageContent) -> None:
+        self.page_content = page_content
+
+
+class CategoryPage(PageType):
     @abstractmethod
-    def extract_products_urls():
+    def extract_products_urls(self):
         pass
 
     @abstractmethod
-    def extract_product_prices():
+    def extract_product_prices(self):
         pass
 
 
-class ProductPage(ABC):
+class ProductPage(PageType):
     @abstractmethod
-    def extract_product_data():
+    def extract_product_data(self):
         pass
 
