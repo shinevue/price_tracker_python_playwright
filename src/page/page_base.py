@@ -1,10 +1,15 @@
+from abc import ABC, abstractmethod
+
 import lxml.etree
 import lxml.html
 import unicodedata
+from urllib.parse import unquote
 
-import src.page
 
 class PageContent:
+    """
+    Responsible for processing page's raw data to a parser-friendly form.
+    """
     def __init__(
         self, url: str, status_code: int, headers: dict, body: bytes, raw_html: str
     ):
@@ -28,4 +33,20 @@ class PageContent:
         tree_parser = lxml.html.HTMLParser(remove_comments=True, recover=True)
         normalized_html = unicodedata.normalize("NFKC", unquote(self.raw_html.strip()))
         return lxml.html.fromstring(normalized_html, parser=tree_parser)
+
+
+class CategoryPage(ABC):
+    @abstractmethod
+    def extract_products_urls():
+        pass
+
+    @abstractmethod
+    def extract_product_prices():
+        pass
+
+
+class ProductPage(ABC):
+    @abstractmethod
+    def extract_product_data():
+        pass
 
