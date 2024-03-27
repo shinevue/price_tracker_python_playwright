@@ -5,6 +5,8 @@ import lxml.html
 import unicodedata
 from urllib.parse import unquote
 
+from src.base.product_base import Product
+
 
 class PageContent:
     """
@@ -42,16 +44,16 @@ class PageType(ABC):
 
 class CategoryPage(PageType):
     @abstractmethod
-    def extract_products_urls(self):
+    def extract_products_urls(self) -> list[Product | None]:
         pass
 
     @abstractmethod
-    def extract_product_prices(self):
+    def extract_product_prices(self) -> list[Product | None]:
         pass
 
 
 class ProductPage(PageType):
     @abstractmethod
-    def extract_product_data(self):
+    def extract_product_data(self) -> Product:
         pass
 
