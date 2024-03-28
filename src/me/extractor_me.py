@@ -1,4 +1,4 @@
-from src.base.scraper_base import CategoryExtractor, ProductExtractor
+from src.base.extractor_base import CategoryExtractor, ProductExtractor
 from src.base.product_base import Product
 from src.exceptions import UnmatchingPrices
 from src.logger import Log
@@ -19,6 +19,7 @@ class MECategoryScraper(CategoryExtractor):
             return int(limit[0])
         except Exception as e:
             print(e)
+            return 0
 
     def extract_products_data(self) -> list[Product | None]:
         result = []
