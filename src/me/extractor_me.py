@@ -1,4 +1,4 @@
-from src.base.scraper_base import CategoryScraper, ProductScraper
+from src.base.scraper_base import CategoryExtractor, ProductExtractor
 from src.base.product_base import Product
 from src.exceptions import UnmatchingPrices
 from src.logger import Log
@@ -10,7 +10,7 @@ from src import utils
 log = Log()
 
 
-class MECategoryScraper(CategoryScraper):
+class MECategoryScraper(CategoryExtractor):
     def extract_max_pagination(self) -> int:
         try:
             limit = self.page.html_tree.xpath(DomainDataME.XPathSelectors['category_page_pagination_limit'])
@@ -96,7 +96,7 @@ class MECategoryScraper(CategoryScraper):
         return result
 
 
-class MEProductScraper(ProductScraper):
+class MEProductScraper(ProductExtractor):
     def extract_product_data(self) -> Product:
         product_item = Product()
         product_item.name = self.page.html_tree.xpath(
