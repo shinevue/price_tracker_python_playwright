@@ -1,18 +1,19 @@
-from src.base.page_base import CategoryPage, ProductPage
+from src.base.scraper_base import CategoryScraper, ProductScraper
 from src.base.product_base import Product
 from src.exceptions import UnmatchingPrices
 from src.me.selectors_me import DomainDataME
 
 from src import utils
 
-class MECategoryPage(CategoryPage):
-    def extract_products_urls(self):
+
+class MECategoryScraper(CategoryScraper):
+    def extract_products_urls(self) -> list[str | None]:
         pass
 
-    def extract_product_prices(self):
+    def extract_products_data(self) -> list[Product | None]:
         pass
 
-class MEProductPage(ProductPage):
+class MEProductScraper(ProductScraper):
     def extract_product_data(self) -> Product:
         product_item = Product()
         product_item.name = self.page_content.html_tree.xpath(DomainDataME.XPathSelectors['product_name'])[0]

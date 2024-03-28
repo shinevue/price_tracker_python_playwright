@@ -37,22 +37,22 @@ class PageContent:
         return lxml.html.fromstring(normalized_html, parser=tree_parser)
 
 
-class PageType(ABC):
+class Scraper(ABC):
     def __init__(self, page_content: PageContent) -> None:
         self.page_content = page_content
 
 
-class CategoryPage(PageType):
+class CategoryScraper(Scraper):
     @abstractmethod
-    def extract_products_urls(self) -> list[Product | None]:
+    def extract_products_urls(self) -> list[str | None]:
         pass
 
     @abstractmethod
-    def extract_product_prices(self) -> list[Product | None]:
+    def extract_products_data(self) -> list[Product | None]:
         pass
 
 
-class ProductPage(PageType):
+class ProductScraper(Scraper):
     @abstractmethod
     def extract_product_data(self) -> Product:
         pass
