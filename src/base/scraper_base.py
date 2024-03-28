@@ -6,6 +6,10 @@ import unicodedata
 from urllib.parse import unquote
 
 from src.base.product_base import Product
+from src.logger import Log
+
+
+log = Log()
 
 
 class PageContent:
@@ -39,7 +43,7 @@ class PageContent:
 
 class Scraper(ABC):
     def __init__(self, page_content: PageContent) -> None:
-        self.page_content = page_content
+        self.page = page_content
 
 
 class CategoryScraper(Scraper):
@@ -50,7 +54,6 @@ class CategoryScraper(Scraper):
     @abstractmethod
     def extract_products_data(self) -> list[Product | None]:
         pass
-
 
 class ProductScraper(Scraper):
     @abstractmethod
