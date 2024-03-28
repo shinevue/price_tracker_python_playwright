@@ -49,11 +49,12 @@ def category_page_scrape(urls: list):
         print("test fragment of html_tree: ", page.html_tree[:150])
 
         result = MECategoryScraper(page_content=page).extract_products_data()
-        print(result)
         for item in result:
-            print(item['product_name'])
-            print(item['price'],)
-            print(item['url'],)
+            if item:
+                print(item.url)
+                print(item.name)
+                print(item.product_code)
+                print(item.price)
 
 if __name__ == "__main__":
     product_page_scrape(urls=["https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5/konsola-sony-playstation-5-slim"])
