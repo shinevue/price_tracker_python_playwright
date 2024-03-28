@@ -56,6 +56,7 @@ def category_page_scrape(urls: list):
                 print(item.product_code)
                 print(item.price)
 
+
 if __name__ == "__main__":
     product_page_scrape(urls=["https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5/konsola-sony-playstation-5-slim"])
     category_page_scrape(urls=["https://www.mediaexpert.pl/agd-do-zabudowy/akcesoria-do-zabudowy/filtry-do-okapow-do-zabudowy"])

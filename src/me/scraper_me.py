@@ -11,8 +11,14 @@ log = Log()
 
 
 class MECategoryScraper(CategoryScraper):
-    def extract_products_urls(self) -> list[str | None]:
-        ...
+    def extract_max_pagination(self) -> int:
+        try:
+            limit = self.page.html_tree.xpath(DomainDataME.XPathSelectors['category_page_pagination_limit'])
+            if len(limit) == 0:
+                return 1
+            return int(limit[0])
+        except Exception as e:
+            print(e)
 
     def extract_products_data(self) -> list[Product | None]:
         result = []
@@ -23,7 +29,7 @@ class MECategoryScraper(CategoryScraper):
             )[0].split(",")
         except IndexError:
             print("No product codes found.")
-            pass
+            log.write(f"Error - {self.page.url} - No product codes found.")
 
         product_boxes = self.page.html_tree.xpath(
             DomainDataME.XPathSelectors["product_container_category_page"]
@@ -33,8 +39,8 @@ class MECategoryScraper(CategoryScraper):
             len(product_codes) == len(product_boxes)
         ), f"product codes lenghts doesnt match number of products for site {self.page.url}"
 
-        print("product codes:", product_codes)
-        print("product codes count:", len(product_codes))
+        # print("product codes:", product_codes)
+        # print("product codes count:", len(product_codes))
 
         empty_prices, coupon_prices, normal_prices = 0, 0, 0
         for index, pc in enumerate(product_boxes):
@@ -62,7 +68,7 @@ class MECategoryScraper(CategoryScraper):
                         DomainDataME.XSelector.CategoryPage.price
                     )
                     if product_price:
-                        normal_prices += 1 
+                        normal_prices += 1
                     else:
                         product_price: list = pc.xpath(
                             DomainDataME.XSelector.CategoryPage.price_with_code
