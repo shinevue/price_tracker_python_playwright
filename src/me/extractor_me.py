@@ -2,7 +2,7 @@ from src.base.extractor_base import CategoryExtractor, ProductExtractor
 from src.base.product_base import Product
 from src.exceptions import UnmatchingPrices
 from src.logger import Log
-from src.me.selectors_me import DomainDataME
+from src.me.site_me import me, MESelectors
 
 from src import utils
 
@@ -13,7 +13,7 @@ log = Log()
 class MECategoryExtractor(CategoryExtractor):
     def extract_max_pagination(self) -> int:
         try:
-            limit = self.page.html_tree.xpath(DomainDataME.XPathSelectors['category_page_pagination_limit'])
+            limit = self.page.html_tree.xpath(MESelectors.pagination_limit)
             if len(limit) == 0:
                 return 1
             return int(limit[0])
@@ -33,7 +33,7 @@ class MECategoryExtractor(CategoryExtractor):
             log.write(f"Error - {self.page.url} - No product codes found.")
 
         product_boxes = self.page.html_tree.xpath(
-            DomainDataME.XPathSelectors["product_container_category_page"]
+            MESelectors.product_container
         )
 
         assert (
@@ -50,7 +50,7 @@ class MECategoryExtractor(CategoryExtractor):
             try:
                 try:
                     product_url: list = pc.xpath(
-                        DomainDataME.XPathSelectors["product_url_category_page"]
+                        MESelectors["product_url_category_page"]
                     )
                     product.url = product_url[0]
                 except Exception as e:
@@ -58,7 +58,7 @@ class MECategoryExtractor(CategoryExtractor):
                     print("exception:", e)
                 try:
                     product_name = pc.xpath(
-                        DomainDataME.XPathSelectors["product_name_category_page"]
+                        MESelectors.product_name
                     )[0].strip()
                     product.name = product_name
                 except Exception as e:
@@ -66,13 +66,13 @@ class MECategoryExtractor(CategoryExtractor):
                     print("exception:", e)
                 try:
                     product_price: list = pc.xpath(
-                        DomainDataME.XSelector.CategoryPage.price
+                        MESelectors.price
                     )
                     if product_price:
                         normal_prices += 1
                     else:
                         product_price: list = pc.xpath(
-                            DomainDataME.XSelector.CategoryPage.price_with_code
+                            MESelectors.price_with_code
                         )
                         if product_price:
                             coupon_prices += 1
@@ -101,10 +101,10 @@ class MEProductExtractor(ProductExtractor):
     def extract_product_data(self) -> Product:
         product_item = Product()
         product_item.name = self.page.html_tree.xpath(
-            DomainDataME.XPathSelectors["product_name"]
+            MESelectors.product_name
         )[0]
         prices_found = self.page.html_tree.xpath(
-            DomainDataME.XPathSelectors["main_price"]
+            me.xpath_selectors["main_price"]
         )
         if prices_found:
             if utils.compare_list_elements(prices_found):

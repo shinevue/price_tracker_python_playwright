@@ -55,10 +55,6 @@ class CategoryExtractor(Extractor):
         pass
 
     @abstractmethod
-    def extract_products_urls(self) -> list[str | None]:
-        pass
-
-    @abstractmethod
     def extract_products_data(self) -> list[Product | None]:
         pass
 

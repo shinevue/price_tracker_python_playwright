@@ -3,6 +3,7 @@ import browser
 from src.base.product_base import Product
 from src.base.extractor_base import PageContent
 from src.me.extractor_me import MECategoryExtractor, MEProductExtractor
+from src.me.site_me import SiteME
 
 
 urls = ["https://en.wikipedia.org/wiki/Security_orchestration",
@@ -48,7 +49,7 @@ def category_page_scrape(urls: list):
         print("status code: ", page.status_code)
         print("test fragment of html_tree: ", page.html_tree[:150])
 
-        result = MECategoryExtractor(page_content=page).extract_products_data()
+        result = MECategoryExtractor(page_content=page, site=SiteME).extract_products_data()
         for item in result:
             if item:
                 print(item.url)
