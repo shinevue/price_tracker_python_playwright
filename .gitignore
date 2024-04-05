@@ -18,3 +18,5 @@ src/logs/
 logs/
 
 *selectors_me.py
+*site_me.py
+src/me/site_me.py
