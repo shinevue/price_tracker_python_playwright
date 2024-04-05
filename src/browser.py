@@ -1,6 +1,6 @@
 from playwright.sync_api import sync_playwright, Response, TimeoutError
 
-from src.base.scraper_base import PageContent
+from src.base.extractor_base import PageContent
 
 
 class Browser:

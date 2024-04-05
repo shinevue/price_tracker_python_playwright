@@ -1,8 +1,8 @@
 from functools import wraps
 import browser
 from src.base.product_base import Product
-from src.base.scraper_base import PageContent
-from src.me.scraper_me import MECategoryScraper, MEProductScraper
+from src.base.extractor_base import PageContent
+from src.me.extractor_me import MECategoryExtractor, MEProductExtractor
 
 
 urls = ["https://en.wikipedia.org/wiki/Security_orchestration",
@@ -26,7 +26,7 @@ def product_page_scrape(urls: list):
         print("test fragment of html_tree: ", page.html_tree[:150])
 
         print("Running Product Scraper")
-        product: Product = MEProductScraper(page_content=page).extract_product_data()
+        product: Product = MEProductExtractor(page_content=page, site="ME").extract_product_data()
         print(product)
         print(product.name)
         print(product.price)
@@ -48,7 +48,7 @@ def category_page_scrape(urls: list):
         print("status code: ", page.status_code)
         print("test fragment of html_tree: ", page.html_tree[:150])
 
-        result = MECategoryScraper(page_content=page).extract_products_data()
+        result = MECategoryExtractor(page_content=page).extract_products_data()
         for item in result:
             if item:
                 print(item.url)

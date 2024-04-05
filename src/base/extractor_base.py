@@ -15,6 +15,7 @@ log = Log()
 
 class PageContent:
     """
+    Product of Browser instances' scrapes, prepared for extraction.
     Responsible for processing page's raw data to a parser-friendly form.
     """
     def __init__(

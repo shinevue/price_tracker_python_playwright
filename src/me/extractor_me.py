@@ -10,7 +10,7 @@ from src import utils
 log = Log()
 
 
-class MECategoryScraper(CategoryExtractor):
+class MECategoryExtractor(CategoryExtractor):
     def extract_max_pagination(self) -> int:
         try:
             limit = self.page.html_tree.xpath(DomainDataME.XPathSelectors['category_page_pagination_limit'])
@@ -97,7 +97,7 @@ class MECategoryScraper(CategoryExtractor):
         return result
 
 
-class MEProductScraper(ProductExtractor):
+class MEProductExtractor(ProductExtractor):
     def extract_product_data(self) -> Product:
         product_item = Product()
         product_item.name = self.page.html_tree.xpath(

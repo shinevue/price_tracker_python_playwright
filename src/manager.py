@@ -1,7 +1,7 @@
 import time
 from src.base.extractor_base import CategoryExtractor
 from src.base.site_base import Site
-from src.me.extractor_me import MECategoryScraper
+from src.me.extractor_me import MECategoryExtractor
 
 
 class Manager:
