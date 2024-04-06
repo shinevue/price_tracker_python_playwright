@@ -3,7 +3,6 @@ import browser
 from src.base.product_base import Product
 from src.base.extractor_base import PageContent
 from src.me.extractor_me import MECategoryExtractor, MEProductExtractor
-from src.me.site_me import SiteME
 
 
 urls = ["https://en.wikipedia.org/wiki/Security_orchestration",
@@ -27,7 +26,7 @@ def product_page_scrape(urls: list):
         print("test fragment of html_tree: ", page.html_tree[:150])
 
         print("Running Product Scraper")
-        product: Product = MEProductExtractor(page_content=page, site="ME").extract_product_data()
+        product: Product = MEProductExtractor(page_content=page).extract_product_data()
         print(product)
         print(product.name)
         print(product.price)
@@ -35,7 +34,7 @@ def product_page_scrape(urls: list):
 
 
 def category_page_scrape(urls: list):
-    b = browser.Browser()
+    b = browser.Browser(render_javascript=True)
     for url in urls:
         print(f"Visiting category page - {url}")
 
@@ -49,13 +48,17 @@ def category_page_scrape(urls: list):
         print("status code: ", page.status_code)
         print("test fragment of html_tree: ", page.html_tree[:150])
 
-        result = MECategoryExtractor(page_content=page, site=SiteME).extract_products_data()
+        result = MECategoryExtractor(page_content=page).extract_category_page()
         for item in result:
             if item:
                 print(item.url)
                 print(item.name)
                 print(item.product_code)
                 print(item.price)
+
+
+def managed_scrape():
+    pass
 
 
 if __name__ == "__main__":

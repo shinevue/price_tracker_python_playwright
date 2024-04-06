@@ -2,7 +2,7 @@ from src.base.extractor_base import CategoryExtractor, ProductExtractor
 from src.base.product_base import Product
 from src.exceptions import UnmatchingPrices
 from src.logger import Log
-from src.me.site_me import me, MESelectors
+from src.me.site_me import MECategorySelectors
 
 from src import utils
 
@@ -13,7 +13,7 @@ log = Log()
 class MECategoryExtractor(CategoryExtractor):
     def extract_max_pagination(self) -> int:
         try:
-            limit = self.page.html_tree.xpath(MESelectors.pagination_limit)
+            limit = self.page.html_tree.xpath(MECategorySelectors.pagination_limit)
             if len(limit) == 0:
                 return 1
             return int(limit[0])
@@ -21,7 +21,7 @@ class MECategoryExtractor(CategoryExtractor):
             print(e)
             return 0
 
-    def extract_products_data(self) -> list[Product | None]:
+    def extract_category_page(self) -> list[Product | None]:
         result = []
         product_codes = []
         try:
@@ -32,9 +32,7 @@ class MECategoryExtractor(CategoryExtractor):
             print("No product codes found.")
             log.write(f"Error - {self.page.url} - No product codes found.")
 
-        product_boxes = self.page.html_tree.xpath(
-            MESelectors.product_container
-        )
+        product_boxes = self.page.html_tree.xpath(MECategorySelectors.product_container)
 
         assert (
             len(product_codes) == len(product_boxes)
@@ -49,30 +47,24 @@ class MECategoryExtractor(CategoryExtractor):
             product = Product(product_code=product_codes[index])
             try:
                 try:
-                    product_url: list = pc.xpath(
-                        MESelectors["product_url_category_page"]
-                    )
+                    product_url: list = pc.xpath(MECategorySelectors.product_url)
                     product.url = product_url[0]
                 except Exception as e:
                     log.write(f"no product URL found at product #{index}")
                     print("exception:", e)
                 try:
-                    product_name = pc.xpath(
-                        MESelectors.product_name
-                    )[0].strip()
+                    product_name = pc.xpath(MECategorySelectors.product_name)[0].strip()
                     product.name = product_name
                 except Exception as e:
                     log.write(f"no product name found at product #{index}")
                     print("exception:", e)
                 try:
-                    product_price: list = pc.xpath(
-                        MESelectors.price
-                    )
+                    product_price: list = pc.xpath(MECategorySelectors.price)
                     if product_price:
                         normal_prices += 1
                     else:
                         product_price: list = pc.xpath(
-                            MESelectors.price_with_code
+                            MECategorySelectors.price_with_code
                         )
                         if product_price:
                             coupon_prices += 1
@@ -84,7 +76,6 @@ class MECategoryExtractor(CategoryExtractor):
                 except Exception as e:
                     log.write(f"no price found at product #{index}")
                     print("exception:", e)
-
 
             except Exception as e:
                 print(f"error at {self.page.url}")
@@ -100,12 +91,10 @@ class MECategoryExtractor(CategoryExtractor):
 class MEProductExtractor(ProductExtractor):
     def extract_product_data(self) -> Product:
         product_item = Product()
-        product_item.name = self.page.html_tree.xpath(
-            MESelectors.product_name
-        )[0]
-        prices_found = self.page.html_tree.xpath(
-            me.xpath_selectors["main_price"]
-        )
+        product_item.name = self.page.html_tree.xpath(MECategorySelectors.product_name)[
+            0
+        ]
+        prices_found = self.page.html_tree.xpath(MECategorySelectors.main_price)
         if prices_found:
             if utils.compare_list_elements(prices_found):
                 product_item.price = float(

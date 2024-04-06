@@ -6,7 +6,6 @@ import unicodedata
 from urllib.parse import unquote
 
 from src.base.product_base import Product
-from src.base.site_base import Site
 from src.logger import Log
 
 
@@ -44,9 +43,8 @@ class PageContent:
 
 
 class Extractor(ABC):
-    def __init__(self, page_content: PageContent, site: Site) -> None:
+    def __init__(self, page_content: PageContent) -> None:
         self.page = page_content
-        self.site = site
 
 
 class CategoryExtractor(Extractor):
@@ -55,7 +53,7 @@ class CategoryExtractor(Extractor):
         pass
 
     @abstractmethod
-    def extract_products_data(self) -> list[Product | None]:
+    def extract_category_page(self) -> list[Product | None]:
         pass
 
 class ProductExtractor(Extractor):

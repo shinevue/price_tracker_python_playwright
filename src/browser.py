@@ -41,6 +41,7 @@ class Browser:
         try:
             response: Response | None = page.goto(url, wait_until="commit")
             if not response:
+                page.screenshot(path=f"screenshot_{url}.png")
                 self.response_error = "No response"
                 return None
             if response.status != 200:
