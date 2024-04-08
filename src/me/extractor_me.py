@@ -44,7 +44,8 @@ class MECategoryExtractor(CategoryExtractor):
         empty_prices, coupon_prices, normal_prices = 0, 0, 0
         for index, pc in enumerate(product_boxes):
             product_url, product_name, product_price = [], [], []
-            product = Product(product_code=product_codes[index])
+            product = Product(product_code=product_codes[index],
+                              name="Unknown")
             try:
                 try:
                     product_url: list = pc.xpath(MECategorySelectors.product_url)
@@ -53,8 +54,11 @@ class MECategoryExtractor(CategoryExtractor):
                     log.write(f"no product URL found at product #{index}")
                     print("exception:", e)
                 try:
-                    product_name = pc.xpath(MECategorySelectors.product_name)[0].strip()
-                    product.name = product_name
+                    for name_regex in MECategorySelectors.product_name:
+                        product_name: list = pc.xpath(name_regex)
+                        if product_name:
+                            product.name = product_name[0].strip()
+                            break
                 except Exception as e:
                     log.write(f"no product name found at product #{index}")
                     print("exception:", e)
@@ -91,9 +95,10 @@ class MECategoryExtractor(CategoryExtractor):
 class MEProductExtractor(ProductExtractor):
     def extract_product_data(self) -> Product:
         product_item = Product()
-        product_item.name = self.page.html_tree.xpath(MECategorySelectors.product_name)[
-            0
-        ]
+        for name_regex in MECategorySelectors.product_name:
+            product_item.name = self.page.html_tree.xpath(name_regex)[0]
+            if product_item.name:
+                break
         prices_found = self.page.html_tree.xpath(MECategorySelectors.main_price)
         if prices_found:
             if utils.compare_list_elements(prices_found):

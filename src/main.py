@@ -3,6 +3,7 @@ import browser
 from src.base.product_base import Product
 from src.base.extractor_base import PageContent
 from src.me.extractor_me import MECategoryExtractor, MEProductExtractor
+from src.manager import Manager
 
 import time
 from datetime import datetime
@@ -124,13 +125,22 @@ def check_manager(
 
 
 if __name__ == "__main__":
+    print("Product scrape...\n")
     product_page_scrape(
         urls=[
             "https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5/konsola-sony-playstation-5-slim"
         ]
     )
+    print("Category scrape...\n")
     category_page_scrape(
         urls=[
             "https://www.mediaexpert.pl/agd-do-zabudowy/akcesoria-do-zabudowy/filtry-do-okapow-do-zabudowy"
         ]
     )
+    print("Manager scrape...\n")
+    mgr = Manager()
+    products = mgr.scrape_full_category(category_url="https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5")
+    for product in products:
+        print(product.name)
+        print(product.price)
+        print("-" * 16)
