@@ -5,7 +5,9 @@ from dataclasses import dataclass
 class MECategorySelectors:
     pagination_limit = """//div[contains(@class,'pagination')]//span[@class='from']/text()"""
     product_container = """//div[@class='offer-box']"""
-    product_name = """.//h1[contains(@class, 'name')]/text()"""
+    product_name = [""".//h1[contains(@class, 'name')]/text()""",
+                    """.//h2[contains(@class,  'name')]/a/text()"""
+                    ]
     price = """.//div[@class='prices']//div[contains(@class,'main-price')]/@mainprice"""
     price_with_code = """.//div[@class='price-box']//div[contains(@class,'main-price')]/@mainprice"""
     main_price = """//div[contains(@class, 'summary-box')]//div[contains(@class,'summary')]//div[contains(@class, 'price-box')]//div[contains(@class,'main-price')]/@mainprice"""

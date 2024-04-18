@@ -20,3 +20,5 @@ logs/
 
 src/me/selectors_me.py
 src/me/site_me.py
+src/visitor.py
+src/scraper.py
