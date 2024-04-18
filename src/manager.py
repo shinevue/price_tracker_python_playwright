@@ -20,10 +20,8 @@ class Manager:
             print("No page in response. Error: ")
             print(b.response_error)
             raise Exception("Error while accessing page")
-
         extractor = MECategoryExtractor(page)
         max_pagination = extractor.extract_max_pagination()
-
         # Request the first page
         page_count = 0
         products = extractor.extract_category_page()
@@ -35,7 +33,6 @@ class Manager:
                 time.sleep(timeout)
                 page_count += 1
                 print(f"Page {page_count}...")
-                # b = Browser(render_javascript=render_javascript)
                 url = category_url + f"?limit=50&page={page_count}"
                 page: PageContent | None = b.visit_url(url=url)
 

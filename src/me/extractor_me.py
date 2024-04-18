@@ -86,7 +86,12 @@ class MECategoryExtractor(CategoryExtractor):
                 print("exception:", e)
             result.append(product)
 
-        msg = f"""Found prices: \n Normal: {normal_prices}\n Coupon: {coupon_prices}\n Empty: {empty_prices}\n"""
+        msg = f"""
+        Url Extraction Overview for URL: \n{self.page.url}\n
+        --Found prices: \n 
+        ----Normal: {normal_prices}\n 
+        ----Coupon: {coupon_prices}\n 
+        ----Empty: {empty_prices}\n"""
         log.write(msg)
         print(msg)
         return result
