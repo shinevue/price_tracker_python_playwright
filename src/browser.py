@@ -35,7 +35,7 @@ class Browser:
             extra_http_headers=self.REQUEST_HEADERS,
         )
 
-    def visit_url(self, url: str, return_type: type[PageContent | SitemapContent] = PageContent) -> PageContent | None:
+    def visit_url(self, url: str, return_type: type[PageContent | SitemapContent] = PageContent) -> PageContent | SitemapContent | None:
         """Visit the given URL"""
         page = self.context.new_page()
         try:

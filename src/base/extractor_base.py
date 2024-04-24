@@ -48,10 +48,10 @@ class SitemapContent(PageContent):
         super().__init__(url, status_code, headers, body, raw_html)
 
     @property
-    def html_tree(self) -> lxml.etree.ElementTree:
-        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
-        xml_tree = etree.fromstring(self.raw_html.encode('utf-8'), parser=parser)
-        return lxml.html.fromstring(normalized_html, parser=tree_parser)
+    def xml_tree(self) -> lxml.etree.ElementTree:
+        parser = lxml.etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        xml_tree = lxml.etree.fromstring(self.raw_html.encode('utf-8'), parser=parser)
+        return xml_tree
 
 
 class Extractor(ABC):
@@ -75,8 +75,13 @@ class ProductExtractor(Extractor):
 
 
 class SitemapExtractor(Extractor):
-    def __init__(self, sitemap):
-        self.sitemap = sitemap
-    @abstractmethod
+    def __init__(self, sitemap_content: SitemapContent):
+        self.sitemap_content = sitemap_content
+
     def extract_categories(self) -> list[str]:
-        pass
+        ns = {'s': "http://www.sitemaps.org/schemas/sitemap/0.9"}
+        urls = self.sitemap_content.xml_tree.xpath('//s:url/s:loc', namespaces=ns)
+        sitemap_urls = []
+        for url in urls:
+            sitemap_urls.append(url.text)
+        return sorted(sitemap_urls)

@@ -1,7 +1,7 @@
 from functools import wraps
 import browser
 from src.base.product_base import Product
-from src.base.extractor_base import PageContent
+from src.base.extractor_base import PageContent, SitemapContent, SitemapExtractor
 from src.me.extractor_me import MECategoryExtractor, MEProductExtractor
 from src.manager import Manager
 
@@ -73,6 +73,14 @@ def category_page_scrape(urls: list):
                 print(item.price)
 
 
+def sitemap_scrape(sitemap_url: str) -> list[str]:
+    b = browser.Browser(render_javascript=False)
+    print(f"Visiting sitemap - {sitemap_url}")
+    sitemap_page: SitemapContent = b.visit_url(url=sitemap_url, return_type=SitemapContent)
+    result = SitemapExtractor(sitemap_content=sitemap_page).extract_categories()
+    return result
+
+
 def check_manager(
     session: Session = db.session,
     save_results: bool = False,
@@ -125,7 +133,7 @@ def check_manager(
 
 
 if __name__ == "__main__":
-    print("Product scrape...\n")
+    # print("Product scrape...\n")
     #  product_page_scrape(
     #      urls=[
     #          "https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5/konsola-sony-playstation-5-slim"
@@ -137,10 +145,14 @@ if __name__ == "__main__":
     #          "https://www.mediaexpert.pl/agd-do-zabudowy/akcesoria-do-zabudowy/filtry-do-okapow-do-zabudowy"
     #      ]
     #  )
-    print("Manager scrape...\n")
-    mgr = Manager()
-    products = mgr.scrape_full_category(category_url="https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5")
-    for product in products:
-        print(product.name)
-        print(product.price)
-        print("-" * 16)
+    # print("Manager scrape...\n")
+    # mgr = Manager()
+    # products = mgr.scrape_full_category(category_url="https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5")
+    # for product in products:
+    #     print(product.name)
+    #     print(product.price)
+    #     print("-" * 16)
+    urls = sitemap_scrape("https://www.mediaexpert.pl/sitemap/sitemap.product_categories.xml")
+    for url in urls:
+        print(url)
+
