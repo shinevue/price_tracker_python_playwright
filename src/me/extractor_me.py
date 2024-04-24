@@ -1,4 +1,4 @@
-from src.base.extractor_base import CategoryExtractor, ProductExtractor
+from src.base.extractor_base import CategoryExtractor, ProductExtractor, SitemapExtractor
 from src.base.product_base import Product
 from src.exceptions import UnmatchingPrices
 from src.logger import Log
@@ -10,8 +10,13 @@ from src import utils
 log = Log()
 
 
+class MESitemapExtractor(SitemapExtractor):
+    pass
+
+
 class MECategoryExtractor(CategoryExtractor):
     def extract_max_pagination(self) -> int:
+        """ Extracts the maximum number of pages from the category page """
         try:
             limit = self.page.html_tree.xpath(MECategorySelectors.pagination_limit)
             if len(limit) == 0:
@@ -22,6 +27,7 @@ class MECategoryExtractor(CategoryExtractor):
             return 0
 
     def extract_category_page(self) -> list[Product | None]:
+        """ Extracts all products data from a single category page """
         result = []
         product_codes = []
         try:
@@ -98,6 +104,7 @@ class MECategoryExtractor(CategoryExtractor):
 
 
 class MEProductExtractor(ProductExtractor):
+    """ Extracts product data from a single-product page """
     def extract_product_data(self) -> Product:
         product_item = Product()
         for name_regex in MECategorySelectors.product_name:

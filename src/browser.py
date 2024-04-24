@@ -1,6 +1,6 @@
 from playwright.sync_api import sync_playwright, Response, TimeoutError
 
-from src.base.extractor_base import PageContent
+from src.base.extractor_base import PageContent, SitemapContent
 
 
 class Browser:
@@ -35,7 +35,7 @@ class Browser:
             extra_http_headers=self.REQUEST_HEADERS,
         )
 
-    def visit_url(self, url: str) -> PageContent | None:
+    def visit_url(self, url: str, return_type: type[PageContent | SitemapContent] = PageContent) -> PageContent | None:
         """Visit the given URL"""
         page = self.context.new_page()
         try:
@@ -47,7 +47,7 @@ class Browser:
             if response.status != 200:
                 self.response_error = f"Error: {response.status}"
                 return None
-            return PageContent(
+            return return_type(
                 url, response.status, response.headers, response.body(), response.text()
             )
         except TimeoutError:

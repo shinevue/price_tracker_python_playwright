@@ -42,6 +42,18 @@ class PageContent:
         return lxml.html.fromstring(normalized_html, parser=tree_parser)
 
 
+
+class SitemapContent(PageContent):
+    def __init__(self, url: str, status_code: int, headers: dict, body: bytes, raw_html: str):
+        super().__init__(url, status_code, headers, body, raw_html)
+
+    @property
+    def html_tree(self) -> lxml.etree.ElementTree:
+        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        xml_tree = etree.fromstring(self.raw_html.encode('utf-8'), parser=parser)
+        return lxml.html.fromstring(normalized_html, parser=tree_parser)
+
+
 class Extractor(ABC):
     def __init__(self, page_content: PageContent) -> None:
         self.page = page_content
@@ -61,3 +73,10 @@ class ProductExtractor(Extractor):
     def extract_product_data(self) -> Product:
         pass
 
+
+class SitemapExtractor(Extractor):
+    def __init__(self, sitemap):
+        self.sitemap = sitemap
+    @abstractmethod
+    def extract_categories(self) -> list[str]:
+        pass
