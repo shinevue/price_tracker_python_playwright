@@ -1,9 +1,7 @@
-from functools import wraps
 from src import browser
 from src.base.product_base import Product
 from src.base.extractor_base import PageContent, SitemapContent, SitemapExtractor
 from src.me.extractor_me import MECategoryExtractor, MEProductExtractor
-from src.manager import Manager
 
 import time
 from datetime import datetime

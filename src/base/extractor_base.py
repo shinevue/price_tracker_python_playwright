@@ -85,3 +85,16 @@ class SitemapExtractor(Extractor):
         for url in urls:
             sitemap_urls.append(url.text)
         return sorted(sitemap_urls)
+
+    @staticmethod
+    def filter_categories(categories: list[str]) -> list[str]:
+        filtered_categories = []
+        for url in categories:
+            url_ok = True
+            for compared_url in categories:
+                if compared_url.startswith(url + "/"):
+                    url_ok = False
+                    break
+            if url_ok:
+                filtered_categories.append(url)
+        return filtered_categories

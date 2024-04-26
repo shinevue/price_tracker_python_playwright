@@ -10,6 +10,10 @@ class CRUD:
         db.execute(insert(self.model).values(obj_in))
         db.commit()
 
+    def bulk_create(self, db: Session, obj_in: list):
+        db.execute(insert(self.model), obj_in)
+        db.commit()
+
     def read(self, db: Session, id):
         return db.execute(select(self.model).where(self.model.id == id)).first()
 

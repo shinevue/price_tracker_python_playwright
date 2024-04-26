@@ -1,13 +1,21 @@
 import time
-from src.base.extractor_base import PageContent
+from src.base.extractor_base import PageContent, SitemapContent, SitemapExtractor
 
 import browser
 from src.me.extractor_me import MECategoryExtractor
 
 
 class Manager:
+    def __init__(self, site: str):
+        match site:
+            case "ME":
+                self.extractor = MECategoryExtractor
+                self.sitemap_extractor = SitemapExtractor
+            case _:
+                raise Exception("Site not supported")
+
+    @staticmethod
     def scrape_full_category(
-        self,
         category_url: str,
         max_pages: int = 0,
         timeout: int = 5,
@@ -45,3 +53,20 @@ class Manager:
                 products.extend(extractor.extract_category_page())
 
         return products
+
+    def parse_sitemap_categories(
+        self,
+        sitemap_url: str
+        ):
+        """ Parse categories from the XML sitemap. The most reliable and accurate way of scraping for categories. """
+        b = browser.Browser()
+        sitemap_content = b.visit_url(sitemap_url)
+        if not sitemap_content:
+            raise Exception("Error while accessing sitemap")
+        category_urls = self.sitemap_extractor.extract_categories(sitemap_content)
+        if not category_urls:
+            raise Exception("No categories found in sitemap")
+        filtered_categories = self.sitemap_extractor.filter_categories(category_urls)
+
+        return filtered_categories
+
