@@ -14,23 +14,24 @@ class Manager:
             case _:
                 raise Exception("Site not supported")
 
-    @staticmethod
     def scrape_full_category(
+        self,
         category_url: str,
         max_pages: int = 0,
         timeout: int = 5,
         render_javascript: bool = False,
     ) -> list:
         url = category_url + "?limit=50"
+        # Initialize the browser
         b = browser.Browser(render_javascript=render_javascript)
+        # Request the first page
         page: PageContent | None = b.visit_url(url=url)
         if not page:
             print("No page in response. Error: ")
             print(b.response_error)
             raise Exception("Error while accessing page")
-        extractor = MECategoryExtractor(page)
+        extractor = self.extractor(page)
         max_pagination = extractor.extract_max_pagination()
-        # Request the first page
         page_count = 0
         products = extractor.extract_category_page()
         if products:
@@ -43,15 +44,12 @@ class Manager:
                 print(f"Page {page_count}...")
                 url = category_url + f"?limit=50&page={page_count}"
                 page: PageContent | None = b.visit_url(url=url)
-
                 if not page:
                     print("No page in response. Error: ")
                     print(b.response_error)
                     continue
-
-                extractor = MECategoryExtractor(page)
+                extractor = self.extractor(page)
                 products.extend(extractor.extract_category_page())
-
         return products
 
     def parse_sitemap_categories(
