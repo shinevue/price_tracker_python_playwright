@@ -29,7 +29,7 @@ class Manager:
         if not page:
             print("No page in response. Error: ")
             print(b.response_error)
-            raise Exception("Error while accessing page")
+            raise Exception(f"Error while accessing page {category_url}")
         extractor = self.extractor(page)
         max_pagination = extractor.extract_max_pagination()
         page_count = 0
@@ -58,10 +58,11 @@ class Manager:
         ):
         """ Parse categories from the XML sitemap. The most reliable and accurate way of scraping for categories. """
         b = browser.Browser()
-        sitemap_content = b.visit_url(sitemap_url)
-        if not sitemap_content:
+        sitemap_content = b.visit_url(sitemap_url, return_type=SitemapContent)
+        if type(sitemap_content) != SitemapContent:
             raise Exception("Error while accessing sitemap")
-        category_urls = self.sitemap_extractor.extract_categories(sitemap_content)
+        extractor = self.sitemap_extractor(sitemap_content)
+        category_urls = extractor.extract_categories()
         if not category_urls:
             raise Exception("No categories found in sitemap")
         filtered_categories = self.sitemap_extractor.filter_categories(category_urls)
