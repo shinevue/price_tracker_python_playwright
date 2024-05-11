@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from database.models import MECategories, MEPrices, MEProducts
 from database.crud import CRUD
 from src.base.extractor_base import PageContent, SitemapContent, SitemapExtractor
+from src import browser
 
-import browser
 from src.me.extractor_me import MECategoryExtractor
 
 
@@ -85,10 +85,12 @@ class TaskManager:
 
     def find_category_tasks(self, limit: int = 1):
         crud = CRUD(self.categories_model)
-        crud.read_multi(
+        categories = crud.read_multi(
             db=self.db,
             limit=limit,
             sort_col="last_check",
             sort_order="asc",
             filters=[(self.categories_model.regular_check.is_(True))],
         )
+        return categories
+

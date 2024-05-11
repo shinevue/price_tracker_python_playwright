@@ -29,7 +29,7 @@ class CRUD:
     ):
         query = select(self.model)
         if filters:
-            query = select(self.model).where(*filters).where(self.model)
+            query = select(self.model).where(*filters)
         if sort_col:
             model_column = getattr(self.model, sort_col, None)
             if model_column is None:
