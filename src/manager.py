@@ -1,11 +1,15 @@
 import time
+
+from sqlalchemy.orm import Session
+from database.models import MECategories, MEPrices, MEProducts
+from database.crud import CRUD
 from src.base.extractor_base import PageContent, SitemapContent, SitemapExtractor
 
 import browser
 from src.me.extractor_me import MECategoryExtractor
 
 
-class Manager:
+class ExtractorManager:
     def __init__(self, site: str):
         match site:
             case "ME":
@@ -52,11 +56,8 @@ class Manager:
                 products.extend(extractor.extract_category_page())
         return products
 
-    def parse_sitemap_categories(
-        self,
-        sitemap_url: str
-        ):
-        """ Parse categories from the XML sitemap. The most reliable and accurate way of scraping for categories. """
+    def parse_sitemap_categories(self, sitemap_url: str):
+        """Parse categories from the XML sitemap. The most reliable and accurate way of scraping for categories."""
         b = browser.Browser()
         sitemap_content = b.visit_url(sitemap_url, return_type=SitemapContent)
         if type(sitemap_content) != SitemapContent:
@@ -69,3 +70,25 @@ class Manager:
 
         return filtered_categories
 
+
+class TaskManager:
+    def __init__(self, db: Session, site: str):
+        self.site = site
+        self.db = db
+        match site:
+            case "ME":
+                self.prices_model = MEPrices
+                self.categories_model = MECategories
+                self.products_model = MEProducts
+            case _:
+                raise Exception("Site not supported")
+
+    def find_category_tasks(self, limit: int = 1):
+        crud = CRUD(self.categories_model)
+        crud.read_multi(
+            db=self.db,
+            limit=limit,
+            sort_col="last_check",
+            sort_order="asc",
+            filters=[(self.categories_model.regular_check.is_(True))],
+        )

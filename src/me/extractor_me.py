@@ -44,9 +44,6 @@ class MECategoryExtractor(CategoryExtractor):
             len(product_codes) == len(product_boxes)
         ), f"product codes lenghts doesnt match number of products for site {self.page.url}"
 
-        # print("product codes:", product_codes)
-        # print("product codes count:", len(product_codes))
-
         empty_prices, coupon_prices, normal_prices = 0, 0, 0
         for index, pc in enumerate(product_boxes):
             product_url, product_name, product_price = [], [], []
