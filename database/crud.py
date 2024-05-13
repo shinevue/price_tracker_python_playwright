@@ -36,7 +36,8 @@ class CRUD:
                 raise ValueError(f"Invalid column name: {sort_col}")
             query = query.order_by(model_column.asc()) if sort_order == "asc" else query.order_by(model_column.desc())
         query = query.offset(skip).limit(limit)
-        return db.execute(select(self.model).offset(skip).limit(limit)).all()
+        print(query)
+        return db.execute(query).all()
 
     def update(self, db: Session, id, obj_in):
         db.execute(update(self.model).where(self.model.id == id).values(obj_in))
