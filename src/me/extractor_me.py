@@ -75,7 +75,6 @@ class MECategoryExtractor(CategoryExtractor):
                         )
                         if product_price:
                             coupon_prices += 1
-                        print(f"price after 2 selector: {product_price}")
                     if product_price:
                         product.price = int(product_price[0]) / 100  # Get value in PLN
                     else:

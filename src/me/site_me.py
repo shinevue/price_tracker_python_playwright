@@ -18,9 +18,9 @@ class MECategorySelectors:
 
 @dataclass
 class MESiteData:
-    domain = 'https://www.mediaexpert.pl',
-    category_sitemap_url = 'https://www.mediaexpert.pl/sitemap/sitemap.product_categories.xml',
-    aliases = ['mediaexpert', 'mediaexpert.pl', 'me'],
+    domain = 'https://www.mediaexpert.pl'
+    category_sitemap_url = 'https://www.mediaexpert.pl/sitemap/sitemap.product_categories.xml'
+    aliases = ['mediaexpert', 'mediaexpert.pl', 'me']
     xpath_selectors = {'category_list': """//div[contains(@class,'menu-category-list')]/ul/li/a/@href""",
                       'inner_categories': """//div[@class='content']//div[@class='row']//a/@href""",
                       'product_url': """//div[@id='section_list-items']//div[@class="offers-list"]//div[@class="offer-box"]//h2[@class='name is-section']//a/@href""",

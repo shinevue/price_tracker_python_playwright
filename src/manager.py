@@ -12,6 +12,7 @@ from src.base.extractor_base import PageContent, SitemapContent, SitemapExtracto
 from src import browser
 
 from src.me.extractor_me import MECategoryExtractor
+from src.me.site_me import MESiteData
 
 
 class ExtractorManager:
@@ -20,17 +21,18 @@ class ExtractorManager:
             case "ME":
                 self.extractor = MECategoryExtractor
                 self.sitemap_extractor = SitemapExtractor
+                self.site_data = MESiteData
             case _:
                 raise Exception("Site not supported")
 
     def scrape_full_category(
         self,
-        category_url: str,
+        category_path: str,
         max_pages: int = 0,
         timeout: int = 5,
         render_javascript: bool = False,
     ) -> list:
-        url = category_url + "?limit=50"
+        url = f"{self.site_data.domain}{category_path}?limit=50"
         # Initialize the browser
         b = browser.Browser(render_javascript=render_javascript)
         # Request the first page
@@ -38,7 +40,7 @@ class ExtractorManager:
         if not page:
             print("No page in response. Error: ")
             print(b.response_error)
-            raise Exception(f"Error while accessing page {category_url}")
+            raise Exception(f"Error while accessing page {url}")
         extractor = self.extractor(page)
         max_pagination = extractor.extract_max_pagination()
         page_count = 0
@@ -51,7 +53,7 @@ class ExtractorManager:
                 time.sleep(timeout)
                 page_count += 1
                 print(f"Page {page_count}...")
-                url = category_url + f"?limit=50&page={page_count}"
+                url = f"{url}&page={page_count}"
                 page: PageContent | None = b.visit_url(url=url)
                 if not page:
                     print("No page in response. Error: ")
