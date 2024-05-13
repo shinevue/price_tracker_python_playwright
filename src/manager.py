@@ -1,6 +1,11 @@
 import time
+from datetime import timedelta
 
+from sqlalchemy import Integer
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func, cast
+from sqlalchemy.sql.functions import concat
+from sqlalchemy.dialects.postgresql import INTERVAL
 from database.models import MECategories, MEPrices, MEProducts
 from database.crud import CRUD
 from src.base.extractor_base import PageContent, SitemapContent, SitemapExtractor
@@ -78,19 +83,21 @@ class TaskManager:
         match site:
             case "ME":
                 self.prices_model = MEPrices
-                self.categories_model = MECategories
+                self.cat_model = MECategories
                 self.products_model = MEProducts
             case _:
                 raise Exception("Site not supported")
 
     def find_category_tasks(self, limit: int = 1):
-        crud = CRUD(self.categories_model)
+        crud = CRUD(self.cat_model)
         categories = crud.read_multi(
             db=self.db,
             limit=limit,
             sort_col="last_check",
             sort_order="asc",
-            filters=[(self.categories_model.regular_check.is_(True))],
+            filters=[self.cat_model.regular_check.is_(True),
+                     self.cat_model.last_check < (func.now() - cast(concat(self.cat_model.check_freq, ' DAYS'), INTERVAL))
+                     ]
         )
         return categories
 
