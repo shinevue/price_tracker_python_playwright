@@ -28,6 +28,7 @@ class PageContent:
 
     @property
     def encoding(self) -> str | None:
+        """Method responsible for extracting page's encoding from it's headers. """
         content_type = self.headers["content-type"].split(";")
         try:
             encoding = content_type[1].strip().split("=")[1].strip()
@@ -37,6 +38,7 @@ class PageContent:
 
     @property
     def html_tree(self) -> lxml.etree.ElementTree:
+        """Method responsible for parsing raw_html to lxml tree."""
         tree_parser = lxml.html.HTMLParser(remove_comments=True, recover=True)
         normalized_html = unicodedata.normalize("NFKC", unquote(self.raw_html.strip()))
         return lxml.html.fromstring(normalized_html, parser=tree_parser)
@@ -44,6 +46,9 @@ class PageContent:
 
 
 class SitemapContent(PageContent):
+    """
+    PageContent variation, but representing the content of XML sitemap.
+    """
     def __init__(self, url: str, status_code: int, headers: dict, body: bytes, raw_html: str):
         super().__init__(url, status_code, headers, body, raw_html)
 
@@ -55,30 +60,45 @@ class SitemapContent(PageContent):
 
 
 class Extractor(ABC):
+    """
+    Abstract Base Class for all Extractors, responsible for extracting data from PageContent objects.
+    """
     def __init__(self, page_content: PageContent) -> None:
         self.page = page_content
 
 
 class CategoryExtractor(Extractor):
+    """
+    Abstract Base Class for extracting data from category pages.
+    """
     @abstractmethod
     def extract_max_pagination(self) -> int:
+        """Function responsible for extracting number of pages of pagination for given category page."""
         pass
 
     @abstractmethod
     def extract_category_page(self) -> list[Product | None]:
+        """Function responsible for extracting products data from given category page."""
         pass
 
 class ProductExtractor(Extractor):
+    """
+    Abstract Base Class for extracting data from single product pages.
+    """
     @abstractmethod
     def extract_product_data(self) -> Product:
         pass
 
 
 class SitemapExtractor(Extractor):
+    """
+    Abstract Base Class for extracting data from SitemapContent objects.
+    """
     def __init__(self, sitemap_content: SitemapContent):
         self.sitemap_content = sitemap_content
 
     def extract_categories(self) -> list[str]:
+        """Method responsible for extracting categories from sitemap. """
         ns = {'s': "http://www.sitemaps.org/schemas/sitemap/0.9"}
         urls = self.sitemap_content.xml_tree.xpath('//s:url/s:loc', namespaces=ns)
         sitemap_urls = []
@@ -88,6 +108,7 @@ class SitemapExtractor(Extractor):
 
     @staticmethod
     def filter_categories(categories: list[str]) -> list[str]:
+        """Method responsible for filtering and deduplicating list of categories' paths. """
         filtered_categories = []
         for url in categories:
             url_ok = True

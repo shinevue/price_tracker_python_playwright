@@ -15,7 +15,6 @@ class MECategorySelectors:
     product_code = """.//div[@class='content']//div[@class='flex-row']//span[contains(@class,'id')]/text()"""
 
 
-
 @dataclass
 class MESiteData:
     domain = 'https://www.mediaexpert.pl'
