@@ -97,23 +97,34 @@ class TaskManager:
             limit=limit,
             sort_col="last_check",
             sort_order="asc",
-            filters=[self.cat_model.regular_check.is_(True),
-                     self.cat_model.last_check < (func.now() - cast(concat(self.cat_model.check_freq, ' DAYS'), INTERVAL))
-                     ]
+            filters=[
+                self.cat_model.regular_check.is_(True),
+                self.cat_model.last_check
+                < (
+                    func.now()
+                    - cast(concat(self.cat_model.check_freq, " DAYS"), INTERVAL)
+                ),
+            ],
         )
         return categories
 
     def insert_or_update_product_list_data(self, category_id: int, products_list: list):
         for product in products_list:
-            insert_st = insert(self.products_model).values(product_name=product.name,
-                                                    product_code=product.product_code,
-                                                    path=product.url,
-                                                    category_id=category_id,
-                                                    last_update=datetime.now())
-            update_st = insert_st.on_conflict_do_update(constraint='me_products_pk',
-                                                        set_=dict(last_update=datetime.now()))
+            insert_st = insert(self.products_model).values(
+                product_name=product.name,
+                product_code=product.product_code,
+                path=product.url,
+                category_id=category_id,
+                last_update=datetime.now(),
+            )
+            update_st = insert_st.on_conflict_do_update(
+                constraint="me_products_pk", set_=dict(last_update=datetime.now())
+            )
             self.db.execute(update_st)
-            result = self.db.scalars(update_st.returning(self.products_model.id), execution_options={'populate_existing': True})
+            result = self.db.scalars(
+                update_st.returning(self.products_model.id),
+                execution_options={"populate_existing": True},
+            )
             product_id = result.first()
             try:
                 # price = int(product['price'][0])
@@ -123,6 +134,3 @@ class TaskManager:
             price_obj = self.prices_model(product_id=product_id, price=price)
             self.db.add(price_obj)
         self.db.commit()
-
-
-
