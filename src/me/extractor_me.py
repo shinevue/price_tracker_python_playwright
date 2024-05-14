@@ -76,7 +76,7 @@ class MECategoryExtractor(CategoryExtractor):
                         if product_price:
                             coupon_prices += 1
                     if product_price:
-                        product.price = int(product_price[0]) / 100  # Get value in PLN
+                        product.price = int(product_price[0]) # Get value in PLN
                     else:
                         empty_prices += 1
                 except Exception as e:

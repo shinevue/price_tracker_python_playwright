@@ -1,11 +1,10 @@
+from datetime import datetime
 import time
-from datetime import timedelta
 
-from sqlalchemy import Integer
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func, cast
 from sqlalchemy.sql.functions import concat
-from sqlalchemy.dialects.postgresql import INTERVAL
+from sqlalchemy.dialects.postgresql import INTERVAL, insert
 from database.models import MECategories, MEPrices, MEProducts
 from database.crud import CRUD
 from src.base.extractor_base import PageContent, SitemapContent, SitemapExtractor
@@ -91,6 +90,7 @@ class TaskManager:
                 raise Exception("Site not supported")
 
     def find_category_tasks(self, limit: int = 1):
+        """Find categories that need to be checked, based on the last check and the check frequency."""
         crud = CRUD(self.cat_model)
         categories = crud.read_multi(
             db=self.db,
@@ -102,4 +102,27 @@ class TaskManager:
                      ]
         )
         return categories
+
+    def insert_or_update_product_list_data(self, category_id: int, products_list: list):
+        for product in products_list:
+            insert_st = insert(self.products_model).values(product_name=product.name,
+                                                    product_code=product.product_code,
+                                                    path=product.url,
+                                                    category_id=category_id,
+                                                    last_update=datetime.now())
+            update_st = insert_st.on_conflict_do_update(constraint='me_products_pk',
+                                                        set_=dict(last_update=datetime.now()))
+            self.db.execute(update_st)
+            result = self.db.scalars(update_st.returning(self.products_model.id), execution_options={'populate_existing': True})
+            product_id = result.first()
+            try:
+                # price = int(product['price'][0])
+                price = product.price
+            except (KeyError, IndexError, ValueError):
+                price = None
+            price_obj = self.prices_model(product_id=product_id, price=price)
+            self.db.add(price_obj)
+        self.db.commit()
+
+
 
