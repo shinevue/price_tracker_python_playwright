@@ -21,9 +21,5 @@ if __name__ == "__main__":
             products = extractor_manager.scrape_full_category(
                 category_path=category.category_path
             )
-            for item in products:
-                print(item.name)
-                print(item.price)
-                print(item.url)
             task_manager.insert_or_update_product_list_data(category_id, products)
 
